@@ -6,47 +6,48 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Install deps
-        run: |
-          npm ci
-      - name: Lint & Typecheck
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Lint and Typecheck
         run: |
           npm run -w client lint || true
           npm run -w server lint || true
           npm run -w client typecheck || true
-      - name: Run unit tests
-        run: |
-          npm run -w client test:unit || true
-      - name: Run E2E perf tests (Playwright)
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - name: Install client deps
-        run: |
-          npm --prefix client ci
-      - name: Run Playwright perf test (cross-browser)
+
+      - name: Run Unit Tests
+        run: npm run -w client test:unit || true
+
+      - name: Run Playwright Perf Tests
         env:
           CI: true
         run: |
           npx playwright test tests/e2e/perf/ai-latency.spec.ts --reporter=list --workers=1 --repeat-each=1 || true
 
-      - name: "Debug: list perf result files"
+      - name: "Debug: list artifacts"
         if: always()
         run: |
-          ls -R tests/test-results || true
-      - name: Upload perf artifacts
+          ls -R tests/test-results || echo "No test-results dir"
+
+      - name: Upload Perf Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-perf-results
           path: tests/test-results/perf/**
-          if-no-files-found: ignore
-      - name: Compare perf to baseline
+          if-no-files-found: warn
+
+      - name: Compare Perf to Baseline
         if: always()
-        run: |
-          node scripts/perf/compare-baseline.js
+        run: node scripts/perf/compare-baseline.js
