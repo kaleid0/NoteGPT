@@ -61,13 +61,16 @@ export default function AIStreamModal({ input, onAccept, onDiscard }: Props) {
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true" aria-labelledby="ai-modal-title">
       <div className={styles.modal}>
-        <h2 id="ai-modal-title" className={styles.srOnly}>AI 助手正在处理</h2>
+        <h2 id="ai-modal-title" className={styles.title}>
+          AI 智能助手
+          {running && <span style={{ fontSize: '0.8rem', fontWeight: 400, marginLeft: '12px', color: 'var(--text-muted)' }}>正在处理中...</span>}
+        </h2>
         <div className={`${styles.content} ai-stream-content`}>
-          {text || (running ? '正在生成内容...' : '无内容')}
+          {text || (running ? '正在生成更智能的内容...' : '未获取到内容')}
         </div>
         <div className={styles.controls}>
           {!running && text.includes('[Error]') && (
-            <button className={styles.retryBtn} onClick={handleStart}>
+            <button className={`${styles.retryBtn} primary`} onClick={handleStart}>
               重试
             </button>
           )}
@@ -77,17 +80,17 @@ export default function AIStreamModal({ input, onAccept, onDiscard }: Props) {
               onDiscard();
             }}
           >
-            丢弃
+            取消
           </button>
           <button
-            className={styles.acceptBtn}
+            className={`${styles.acceptBtn} primary`}
             onClick={() => {
               stop();
               onAccept(text);
             }}
             disabled={running && text.length === 0}
           >
-            接受
+            采用
           </button>
         </div>
       </div>

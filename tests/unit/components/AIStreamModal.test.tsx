@@ -7,6 +7,7 @@ vi.mock('../../../client/src/hooks/useAIStream', () => ({
 
 import { useAIStream } from '../../../client/src/hooks/useAIStream'
 import AIStreamModal from '../../../client/src/components/AIStreamModal/AIStreamModal'
+import { ToastProvider } from '../../../client/src/components/Toast/ToastContext'
 
 describe('AIStreamModal', () => {
   it('shows streaming and accepts/discards', async () => {
@@ -22,10 +23,14 @@ describe('AIStreamModal', () => {
     const onAccept = vi.fn()
     const onDiscard = vi.fn()
 
-    render(<AIStreamModal input="x" onAccept={onAccept} onDiscard={onDiscard} />)
+    render(
+      <ToastProvider>
+        <AIStreamModal input="x" onAccept={onAccept} onDiscard={onDiscard} />
+      </ToastProvider>
+    )
 
-    // initially streaming placeholder should be shown
-    expect(screen.getByText('Streaming...')).toBeInTheDocument()
+    // initially streaming placeholder should be shown (Chinese text)
+    expect(screen.getByText('正在生成内容...')).toBeInTheDocument()
 
     // after start ran, text should update (wait for async deltas)
     expect(await screen.findByText((c) => c.includes('hello') && c.includes('world'))).toBeInTheDocument()

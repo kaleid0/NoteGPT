@@ -8,15 +8,24 @@ export default function App() {
   return (
     <ToastProvider>
       <BrowserRouter>
-        <header style={{ padding: 12, borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between' }}>
-          <div>
-            <Link to="/">NoteGPT</Link>
-          </div>
-          <div>
-            <Link to="/settings">设置</Link>
+        <header style={{ 
+          backgroundColor: '#fff', 
+          borderBottom: '1px solid var(--border-color)', 
+          padding: '0.75rem 0',
+          marginBottom: '2rem',
+          boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+        }}>
+          <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Link to="/" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary-color)' }}>
+              NoteGPT
+            </Link>
+            <nav style={{ display: 'flex', gap: '1.5rem' }}>
+              <Link to="/" style={{ fontWeight: 500, color: 'var(--text-main)' }}>我的笔记</Link>
+              <Link to="/settings" style={{ fontWeight: 500, color: 'var(--text-main)' }}>设置</Link>
+            </nav>
           </div>
         </header>
-        <main>
+        <main className="container">
           <Routes>
             <Route path="/" element={<NotesList />} />
             <Route path="/note/:id" element={<NoteDetail />} />

@@ -75,12 +75,14 @@ export default function NoteDetail() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <h1>Note Detail</h1>
-      <NoteEditor content={note.content} onChange={handleChange} />
-      <div style={{ marginTop: 8 }}>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h1 style={{ fontSize: '1.5rem' }}>{note.title || 'Untitled'}</h1>
         <AIButton onClick={handleAIProcess} />
       </div>
+      
+      <NoteEditor content={note.content} onChange={handleChange} />
+
       {showModal && (
         <AIStreamModal
           input={modalInput}

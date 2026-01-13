@@ -21,8 +21,7 @@ export default function NotesList() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <h1>Notes</h1>
+    <div>
       <NoteList notes={notes} onCreate={handleCreate} />
     </div>
   );

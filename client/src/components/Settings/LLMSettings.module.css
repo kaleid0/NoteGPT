@@ -1,23 +1,26 @@
 .container {
   max-width: 600px;
   margin: 0 auto;
-  padding: 24px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fff;
+  padding: 32px;
+  border-radius: 12px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
 }
 
 .container h1 {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #1f2937;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--text-main);
+  border-bottom: 2px solid var(--bg-color);
+  padding-bottom: 12px;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .formGroup {
@@ -27,75 +30,79 @@
 }
 
 .formGroup label {
-  font-weight: 500;
-  color: #374151;
-  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 0.875rem;
 }
 
 .input,
 .select,
 .textarea {
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 0.95rem;
   font-family: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.2s;
+  background-color: #fff;
 }
 
 .input:focus,
 .select:focus,
 .textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .textarea {
   min-height: 120px;
   resize: vertical;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  line-height: 1.5;
+  background-color: #f8fafc;
 }
 
 .hint {
   display: block;
-  font-size: 12px;
-  color: #6b7280;
+  font-size: 11px;
+  color: var(--text-muted);
   margin-top: 4px;
-  line-height: 1.4;
+  line-height: 1.5;
+  background: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   margin-top: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
 }
 
 .button {
-  padding: 8px 16px;
-  background: #3b82f6;
+  padding: 10px 24px;
+  background: var(--primary-color);
   color: white;
   border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .button:hover {
-  background: #2563eb;
-}
-
-.button:active {
-  background: #1d4ed8;
+  background: var(--primary-hover);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .successMessage {
-  font-size: 14px;
-  color: #10b981;
-  font-weight: 500;
+  font-size: 0.875rem;
+  color: #059669;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
