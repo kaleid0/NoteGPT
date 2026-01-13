@@ -14,7 +14,12 @@ export default defineConfig({
     headless: true,
     actionTimeout: 60000,
   },
-  webServer: {
+  webServer: process.env.CI ? {
+    command: 'npm --prefix client run build && npm --prefix client run preview -- --port 3000',
+    url: 'http://localhost:3000',
+    timeout: 180000,
+    reuseExistingServer: true,
+  } : {
     command: 'npm --prefix client run dev -- --host',
     url: 'http://localhost:3000',
     timeout: 120000,
