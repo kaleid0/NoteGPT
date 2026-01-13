@@ -37,7 +37,7 @@ jobs:
       - name: Debug: list perf result files
         if: always()
         run: |
-          echo "PWD: \E:\vscode_projects\NoteGPT"
+          echo "PWD: $(pwd)"
           ls -la tests/test-results/perf || true
       - name: Upload perf artifacts
         if: always()
