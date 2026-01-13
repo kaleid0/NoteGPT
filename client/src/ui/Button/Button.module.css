@@ -1,0 +1,40 @@
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --radius: 8px;
+}
+
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  background: white;
+  color: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.primary {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: transparent;
+}
+
+.ghost {
+  background: transparent;
+  border-color: var(--border-color, #e2e8f0);
+}
+
+.small {
+  padding: 6px 10px;
+  font-size: 14px;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+}

@@ -1,0 +1,18 @@
+.primary {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.primary:hover {
+  background-color: #dc2626;
+}
+
+.primary:focus {
+  outline: 3px solid rgba(239, 68, 68, 0.16);
+  outline-offset: 2px;
+}

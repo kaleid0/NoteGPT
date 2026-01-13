@@ -1,5 +1,4 @@
 import styles from './ConfirmDialog.module.css';
-
 export default function ConfirmDialog({ title, onConfirm, onCancel }: { title?: string; onConfirm: ()=>void; onCancel: ()=>void }) {
   return (
     <div style={{
@@ -23,7 +22,7 @@ export default function ConfirmDialog({ title, onConfirm, onCancel }: { title?: 
         <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>您确定要执行此操作吗？此操作可能无法撤销。</p>
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
           <button onClick={onCancel}>取消</button>
-          <button className={styles.primary} onClick={onConfirm}>确认</button>
+          <button className={[styles.primary].filter(Boolean).join(' ')} onClick={onConfirm} style={{ backgroundColor: '#ef4444' }}>确认</button>
         </div>
       </div>
     </div>

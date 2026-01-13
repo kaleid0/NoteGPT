@@ -1,0 +1,59 @@
+.aiButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  border: none;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+  font-size: 1rem;
+  border-radius: var(--radius, 8px);
+  cursor: pointer;
+}
+
+.aiButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px -1px rgba(99, 102, 241, 0.5);
+}
+
+.aiButton:active {
+  transform: translateY(0);
+}
+
+.icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .aiButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    gap: 6px;
+  }
+  
+  .icon {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .aiButton {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.85rem;
+    gap: 5px;
+    box-shadow: 0 2px 4px -1px rgba(99, 102, 241, 0.4);
+  }
+  
+  .aiButton:hover {
+    box-shadow: 0 3px 6px -1px rgba(99, 102, 241, 0.5);
+  }
+  
+  .icon {
+    font-size: 0.95rem;
+  }
+}

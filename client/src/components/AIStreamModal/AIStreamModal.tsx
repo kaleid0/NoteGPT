@@ -65,12 +65,12 @@ export default function AIStreamModal({ input, onAccept, onDiscard }: Props) {
           AI 智能助手
           {running && <span style={{ fontSize: '0.8rem', fontWeight: 400, marginLeft: '12px', color: 'var(--text-muted)' }}>正在处理中...</span>}
         </h2>
-        <div className={`${styles.content} ai-stream-content`}>
+        <div className={`${styles.content} ${styles.aiStreamContent}`}>
           {text || (running ? '正在生成更智能的内容...' : '未获取到内容')}
         </div>
         <div className={styles.controls}>
           {!running && text.includes('[Error]') && (
-            <button className={`${styles.retryBtn} primary`} onClick={handleStart}>
+            <button className={`${styles.retryBtn} ${styles.primary}`} onClick={handleStart}>
               重试
             </button>
           )}
@@ -83,7 +83,7 @@ export default function AIStreamModal({ input, onAccept, onDiscard }: Props) {
             取消
           </button>
           <button
-            className={`${styles.acceptBtn} primary`}
+            className={`${styles.acceptBtn} ${styles.primary}`}
             onClick={() => {
               stop();
               onAccept(text);

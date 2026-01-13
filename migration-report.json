@@ -1,0 +1,33 @@
+[
+  {
+    "file": "client/src/components/ConfirmDialog/ConfirmDialog.tsx",
+    "applied": true,
+    "notes": [
+      "Applied import of ConfirmDialog.module.css and replaced literal className with module reference",
+      "Added ConfirmDialog.module.css"
+    ]
+  },
+  {
+    "file": "client/src/components/NoteList/NoteList.tsx",
+    "applied": true,
+    "notes": [
+      "Replaced className=\"primary\" / \"danger\" with styles.primary / styles.danger",
+      "Added .primary and .danger to NoteList.module.css"
+    ]
+  },
+  {
+    "file": "client/src/components/AIStreamModal/AIStreamModal.tsx",
+    "applied": true,
+    "notes": [
+      "Replaced mixed module+global className usages with module-only classes",
+      "Added .primary and .aiStreamContent to AIStreamModal.module.css"
+    ]
+  },
+  {
+    "file": "client/src/components/Toast/Toast.tsx",
+    "applied": false,
+    "notes": [
+      "Skipped complex template expression with non-styles interpolation; manual review required"
+    ]
+  }
+]

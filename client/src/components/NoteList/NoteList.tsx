@@ -36,7 +36,7 @@ export default function NoteList({ notes = [], onCreate }: { notes?: NoteItem[];
     <div className={styles.root}>
       <div className={styles.header}>
         <h2 style={{ fontSize: '1.25rem' }}>所有笔记</h2>
-        <button className="primary" onClick={onCreate} aria-label="Create note">新建笔记</button>
+        <button className={styles.primary} onClick={onCreate} aria-label="Create note">新建笔记</button>
       </div>
       {notes.length === 0 && <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>暂无笔记</div>}
       <div className={styles.list}>
@@ -49,7 +49,7 @@ export default function NoteList({ notes = [], onCreate }: { notes?: NoteItem[];
             <div className={styles.itemActions}>
               <button
                 aria-label={`Delete note ${n.id}`}
-                className="danger"
+                className={styles.danger}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
