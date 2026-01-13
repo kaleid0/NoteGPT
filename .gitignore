@@ -1,0 +1,38 @@
+# Node / JavaScript
+node_modules/
+dist/
+build/
+coverage/
+
+# Environment
+.env*
+client/.env
+server/.env
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs and temp
+*.log
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tmp
+*.swp
+
+# Other
+/.parcel-cache
+/.turbo
+.vscode/
+.github/
+.specify/
+specs/
+
+# Test artifacts
+tests/test-results/
+

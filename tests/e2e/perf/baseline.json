@@ -1,0 +1,8 @@
+{
+  "p95_threshold_ms": 2000,
+  "browsers": {
+    "chromium": { "p95_threshold_ms": 2000 },
+    "firefox": { "p95_threshold_ms": 2500 },
+    "webkit": { "p95_threshold_ms": 2500 }
+  }
+}

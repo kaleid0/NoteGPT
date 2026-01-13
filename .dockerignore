@@ -1,0 +1,13 @@
+# Ignore local node modules, logs and environment files
+node_modules/
+.git
+Dockerfile*
+.dockerignore
+*.log*
+.env*
+coverage/
+dist/
+build/
+
+# Test artifacts
+tests/test-results/
