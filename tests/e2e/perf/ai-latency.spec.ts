@@ -38,34 +38,6 @@ test.describe('AI streaming performance', () => {
     page.on('crash', () => console.log('[PAGE CRASHED]'))
     page.on('close', () => console.log('[PAGE CLOSED]'))
     page.on('requestfailed', req => console.log('[REQUEST FAILED]', req.url(), req.failure()?.errorText ?? ''))
-    for (let i = 0; i < 3; i++) {
-      try {
-        await page.evaluate((note) => {
-          return new Promise<void>((res) => {
-            const req = indexedDB.open('notegpt-db', 1)
-            req.onupgradeneeded = () => {
-              const db = req.result
-              if (!db.objectStoreNames.contains('notes')) {
-                const store = db.createObjectStore('notes', { keyPath: 'id' })
-                store.createIndex('by-updated', 'updatedAt')
-              }
-            }
-            req.onsuccess = () => {
-              const tx = req.result.transaction('notes', 'readwrite')
-              tx.objectStore('notes').put(note)
-              tx.oncomplete = () => res()
-              tx.onerror = () => res()
-            }
-            req.onerror = () => res()
-          })
-        }, note)
-        break
-      } catch (err) {
-        console.log('[E2E] IndexedDB write failed, retrying', err)
-        await page.waitForTimeout(300)
-        if (i === 2) throw err
-      }
-    }
 
     // seed a note
     const noteId = 'perf-note-1'
