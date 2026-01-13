@@ -1,0 +1,10 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.textarea {
+  min-height: 200px;
+  padding: 8px;
+  font-size: 15px;
+}
