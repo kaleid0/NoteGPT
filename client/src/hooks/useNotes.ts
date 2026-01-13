@@ -29,6 +29,7 @@ export function useNotes() {
     [reload]
   );
 
+  // 更新笔记
   const update = useCallback(
     async (note: Note) => {
       await upsertNote(note);
@@ -37,16 +38,21 @@ export function useNotes() {
     [reload]
   );
 
+  // 修改指定范围内容，AI 辅助写作时使用
   const replaceRange = useCallback(
     async (id: string, start: number, end: number, replacement: string) => {
       const note = await getNote(id);
-      if (!note) throw new Error('Note not found')
-      const content = note.content || ''
-      const updatedContent = content.substring(0, start) + replacement + content.substring(end)
-      const updated: Note = { ...note, content: updatedContent, updatedAt: new Date().toISOString() }
-      await upsertNote(updated)
-      await reload()
-      return updated
+      if (!note) throw new Error('Note not found');
+      const content = note.content || '';
+      const updatedContent = content.substring(0, start) + replacement + content.substring(end);
+      const updated: Note = {
+        ...note,
+        content: updatedContent,
+        updatedAt: new Date().toISOString(),
+      };
+      await upsertNote(updated);
+      await reload();
+      return updated;
     },
     [reload]
   );

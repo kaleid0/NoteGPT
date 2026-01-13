@@ -4,3 +4,6 @@ build/
 coverage/
 *.log
 .env
+
+# Test artifacts
+tests/test-results/

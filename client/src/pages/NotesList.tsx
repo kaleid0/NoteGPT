@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NoteList from '../components/NoteList/NoteList';
 import { Note } from '../lib/db/notes';

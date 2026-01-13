@@ -21,8 +21,11 @@ export default defineConfig({
     baseURL: process.env.PW_BASE_URL || 'http://localhost:3000',
     headless: true,
     actionTimeout: 60000,
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
   },
-  webServer: process.env.CI ? {
+  // In CI with PW_BASE_URL set, servers are started externally; skip webServer
+  webServer: process.env.PW_BASE_URL ? undefined : (process.env.CI ? {
     command: 'npm --prefix client run build && npm --prefix client run preview -- --port 3000',
     url: 'http://localhost:3000',
     timeout: 180000,
@@ -32,5 +35,5 @@ export default defineConfig({
     url: 'http://localhost:3000',
     timeout: 120000,
     reuseExistingServer: true,
-  },
+  }),
 })
