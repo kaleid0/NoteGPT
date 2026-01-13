@@ -35,6 +35,19 @@ jobs:
         run: |
           # Run perf test across all projects (chromium, firefox, webkit)
           npx playwright test tests/e2e/perf/ai-latency.spec.ts --reporter=list --workers=1 --repeat-each=1 || true
+      - name: Debug: list perf result files
+        if: always()
+        run: |
+          echo "PWD: $(pwd)"
+          echo "--- Listing tests/test-results ---"
+          ls -la tests/test-results || true
+          echo "--- Listing tests/test-results/perf ---"
+          ls -la tests/test-results/perf || true
+          echo "--- Dump perf json files (if any) ---"
+          for f in tests/test-results/perf/*.json; do
+            echo "---- $f ----"
+            cat "$f" || true
+          done || true
       - name: Upload perf artifacts
         if: always()
         uses: actions/upload-artifact@v4
