@@ -84,26 +84,37 @@ test.describe('AI streaming performance', () => {
     const start = Date.now()
     const contentLocator = page.locator('[role="dialog"] .ai-stream-content')
 
-    // Wait for first non-empty text node inside the content area
-    await page.waitForFunction((selector) => {
-      const el = document.querySelector(selector)
-      if (!el) return false
-      return el.textContent && el.textContent.trim().length > 0
-    }, `[role="dialog"] .ai-stream-content`, { timeout: 15000 })
+    let latency = null
+    let errorMessage = null
 
-    const firstCharAt = Date.now()
-    const latency = firstCharAt - start
-
-    // Save result
-    const results = { timestamp: new Date().toISOString(), browser: browserName, latency }
     try {
-      fs.mkdirSync(RESULTS_DIR, { recursive: true })
-      fs.writeFileSync(path.join(RESULTS_DIR, `ai-first-char-${Date.now()}.json`), JSON.stringify(results, null, 2))
-    } catch (e) {
-      // ignore file write errors in CI ephemeral env
+      // Wait for first non-empty text node inside the content area
+      await page.waitForFunction((selector) => {
+        const el = document.querySelector(selector)
+        if (!el) return false
+        return el.textContent && el.textContent.trim().length > 0
+      }, `[role="dialog"] .ai-stream-content`, { timeout: 15000 })
+
+      const firstCharAt = Date.now()
+      latency = firstCharAt - start
+    } catch (err) {
+      errorMessage = String(err && err.message ? err.message : err)
+      console.warn('[PERF] Error measuring first-char latency:', errorMessage)
+    } finally {
+      // Save result (always attempt to write a file so CI artifact step can find it)
+      const results = { timestamp: new Date().toISOString(), browser: browserName, latency, error: errorMessage }
+      try {
+        fs.mkdirSync(RESULTS_DIR, { recursive: true })
+        const fname = path.join(RESULTS_DIR, `ai-first-char-${Date.now()}.json`)
+        fs.writeFileSync(fname, JSON.stringify(results, null, 2))
+        console.log('[PERF] Wrote results to', fname)
+      } catch (e) {
+        console.warn('[PERF] Could not write results file', e)
+      }
     }
 
     // Assert p95 target for this single run (for now): <= 2000ms
+    if (errorMessage) throw new Error('Failed to observe AI first character: ' + errorMessage)
     expect(latency).toBeLessThanOrEqual(2000)
   })
 })
