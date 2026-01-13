@@ -1,53 +1,21 @@
-import { useCallback, useEffect, useState } from 'react';
-import { getAllNotes, getNote, upsertNote, deleteNote, Note } from '../lib/db/notes';
+import { useCallback, useEffect } from 'react';
+import { Note } from '../lib/db/notes';
+import useNotesStore from '../stores/notesStore';
 
 /**
  * 笔记管理 Hook（本地 IndexedDB）
  * 注意：此 Hook 仅管理本地数据，同步逻辑请使用 SyncContext
  */
 export function useNotes() {
-  const [notes, setNotes] = useState<Note[]>([]);
-
-  const reload = useCallback(async () => {
-    const all = await getAllNotes();
-    setNotes(all);
-  }, []);
-
-  useEffect(() => {
-    reload();
-  }, [reload]);
-
-  const create = useCallback(
-    async (note: Note) => {
-      await upsertNote(note);
-      await reload();
-      return note;
-    },
-    [reload]
-  );
-
-  const remove = useCallback(
-    async (id: string) => {
-      await deleteNote(id);
-      await reload();
-    },
-    [reload]
-  );
-
-  // 更新笔记
-  const update = useCallback(
-    async (note: Note) => {
-      await upsertNote(note);
-      await reload();
-      return note;
-    },
-    [reload]
-  );
-
-  // 修改指定范围内容，AI 辅助写作时使用
+  const notes = useNotesStore((s) => s.noteIds.map((id) => s.notesById[id]).filter(Boolean));
+  const reload = useNotesStore((s) => s.reload);
+  const create = useNotesStore((s) => s.create);
+  const remove = useNotesStore((s) => s.remove);
+  const update = useNotesStore((s) => s.upsert);
   const replaceRange = useCallback(
     async (id: string, start: number, end: number, replacement: string) => {
-      const note = await getNote(id);
+      const state = useNotesStore.getState();
+      const note = state.notesById[id];
       if (!note) throw new Error('Note not found');
       const content = note.content || '';
       const updatedContent = content.substring(0, start) + replacement + content.substring(end);
@@ -56,12 +24,15 @@ export function useNotes() {
         content: updatedContent,
         updatedAt: new Date().toISOString(),
       };
-      await upsertNote(updated);
-      await reload();
+      await state.upsert(updated);
       return updated;
     },
-    [reload]
+    []
   );
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
 
   return { notes, reload, create, remove, update, replaceRange };
 }

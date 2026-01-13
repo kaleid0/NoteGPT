@@ -5,11 +5,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { 
   Note, 
+  Tag,
+  Category,
   SyncMessage, 
-  InitResponseMessage, 
+  InitResponseMessage,
+  InitResponseNormMessage,
   UpdateMessage, 
   CreateMessage, 
   DeleteMessage,
+  TagCreateMessage,
+  TagUpdateMessage,
+  TagDeleteMessage,
+  CategoryCreateMessage,
+  CategoryUpdateMessage,
+  CategoryDeleteMessage,
+  RelationAddMessage,
+  RelationRemoveMessage,
   AckMessage 
 } from '../lib/sync-protocol';
 import { generateClientId } from '../lib/sync-protocol';
@@ -23,6 +34,14 @@ export interface SyncEvents {
   onNoteUpdate?: (note: Note) => void;
   onNoteCreate?: (note: Note) => void;
   onNoteDelete?: (noteId: string) => void;
+  onTagCreate?: (tag: Tag) => void;
+  onTagUpdate?: (tag: Tag) => void;
+  onTagDelete?: (tagId: string) => void;
+  onCategoryCreate?: (category: Category) => void;
+  onCategoryUpdate?: (category: Category) => void;
+  onCategoryDelete?: (categoryId: string) => void;
+  onRelationAdd?: (relationName: 'note_tags' | 'note_categories', noteId: string, targetId: string) => void;
+  onRelationRemove?: (relationName: 'note_tags' | 'note_categories', noteId: string, targetId: string) => void;
   onConnectionChange?: (status: ConnectionStatus) => void;
 }
 
@@ -98,6 +117,27 @@ export function useSync(events: SyncEvents, options: SyncOptions = {}) {
           eventsRef.current.onNotesInit?.(initMsg.notes);
           break;
         }
+        case 'INIT_RESPONSE_NORM': {
+          const initNormMsg = message as InitResponseNormMessage;
+          const payload = initNormMsg.payload;
+          // Handle normalized payload
+          eventsRef.current.onNotesInit?.(payload.notes);
+          // Emit tag/category creation events
+          for (const tag of payload.tags) {
+            eventsRef.current.onTagCreate?.(tag);
+          }
+          for (const cat of payload.categories) {
+            eventsRef.current.onCategoryCreate?.(cat);
+          }
+          // Emit relation add events
+          for (const rel of payload.relations.note_tags) {
+            eventsRef.current.onRelationAdd?.('note_tags', rel.noteId, rel.tagId);
+          }
+          for (const rel of payload.relations.note_categories) {
+            eventsRef.current.onRelationAdd?.('note_categories', rel.noteId, rel.categoryId);
+          }
+          break;
+        }
         case 'UPDATE': {
           const updateMsg = message as UpdateMessage;
           // 忽略自己发送的消息
@@ -117,6 +157,62 @@ export function useSync(events: SyncEvents, options: SyncOptions = {}) {
           const deleteMsg = message as DeleteMessage;
           if (deleteMsg.clientId !== clientId) {
             eventsRef.current.onNoteDelete?.(deleteMsg.noteId);
+          }
+          break;
+        }
+        case 'TAG_CREATE': {
+          const tagMsg = message as TagCreateMessage;
+          if (tagMsg.clientId !== clientId) {
+            eventsRef.current.onTagCreate?.(tagMsg.tag);
+          }
+          break;
+        }
+        case 'TAG_UPDATE': {
+          const tagMsg = message as TagUpdateMessage;
+          if (tagMsg.clientId !== clientId) {
+            eventsRef.current.onTagUpdate?.(tagMsg.tag);
+          }
+          break;
+        }
+        case 'TAG_DELETE': {
+          const tagMsg = message as TagDeleteMessage;
+          if (tagMsg.clientId !== clientId) {
+            eventsRef.current.onTagDelete?.(tagMsg.tagId);
+          }
+          break;
+        }
+        case 'CATEGORY_CREATE': {
+          const catMsg = message as CategoryCreateMessage;
+          if (catMsg.clientId !== clientId) {
+            eventsRef.current.onCategoryCreate?.(catMsg.category);
+          }
+          break;
+        }
+        case 'CATEGORY_UPDATE': {
+          const catMsg = message as CategoryUpdateMessage;
+          if (catMsg.clientId !== clientId) {
+            eventsRef.current.onCategoryUpdate?.(catMsg.category);
+          }
+          break;
+        }
+        case 'CATEGORY_DELETE': {
+          const catMsg = message as CategoryDeleteMessage;
+          if (catMsg.clientId !== clientId) {
+            eventsRef.current.onCategoryDelete?.(catMsg.categoryId);
+          }
+          break;
+        }
+        case 'RELATION_ADD': {
+          const relMsg = message as RelationAddMessage;
+          if (relMsg.clientId !== clientId) {
+            eventsRef.current.onRelationAdd?.(relMsg.relationName, relMsg.noteId, relMsg.targetId);
+          }
+          break;
+        }
+        case 'RELATION_REMOVE': {
+          const relMsg = message as RelationRemoveMessage;
+          if (relMsg.clientId !== clientId) {
+            eventsRef.current.onRelationRemove?.(relMsg.relationName, relMsg.noteId, relMsg.targetId);
           }
           break;
         }

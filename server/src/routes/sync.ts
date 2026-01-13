@@ -1,19 +1,30 @@
 /**
  * WebSocket 同步路由
- * 处理多端实时协作编辑的消息同步
+ * 处理多端实时协作编辑的消息同步，包括笔记、标签、分类及其关系的同步
  */
 import { FastifyPluginAsync } from 'fastify';
 import { SocketStream } from '@fastify/websocket';
 import type { WebSocket } from 'ws';
 import type { 
   Note, 
-  SyncMessage, 
-  InitResponseMessage, 
+  Tag,
+  Category,
+  SyncMessage,
+  InitResponseMessage,
+  InitResponseNormMessage,
   UpdateMessage, 
   CreateMessage, 
   DeleteMessage,
+  TagCreateMessage,
+  TagUpdateMessage,
+  TagDeleteMessage,
+  CategoryCreateMessage,
+  CategoryUpdateMessage,
+  CategoryDeleteMessage,
+  RelationAddMessage,
+  RelationRemoveMessage,
   AckMessage 
-} from '../../shared/sync-protocol';
+} from '../sync-protocol';
 import * as db from '../services/database';
 
 // 连接池：存储所有活跃的 WebSocket 连接
@@ -27,6 +38,9 @@ const connections = new Map<string, ClientConnection>();
 // 心跳检测间隔（30秒）
 const HEARTBEAT_INTERVAL = 30000;
 const HEARTBEAT_TIMEOUT = 60000;
+
+// 是否使用规范化 payload（可通过环境变量控制）
+const USE_NORMALIZED_PAYLOAD = process.env.USE_NORMALIZED_PAYLOAD !== 'false';
 
 /**
  * 广播消息给所有其他客户端
@@ -128,16 +142,29 @@ const syncRoute: FastifyPluginAsync = async (fastify) => {
 
         switch (message.type) {
           case 'INIT': {
-            // 从数据库获取所有笔记
-            const notes = db.getAllNotes();
-            const response: InitResponseMessage = {
-              type: 'INIT_RESPONSE',
-              timestamp: Date.now(),
-              clientId,
-              notes,
-            };
-            sendTo(clientId, response);
-            fastify.log.info(`Sent ${notes.length} notes to client ${clientId}`);
+            if (USE_NORMALIZED_PAYLOAD) {
+              // Send normalized payload
+              const payload = db.getNormalizedPayload();
+              const response: InitResponseNormMessage = {
+                type: 'INIT_RESPONSE_NORM',
+                timestamp: Date.now(),
+                clientId,
+                payload,
+              };
+              sendTo(clientId, response);
+              fastify.log.info(`Sent normalized payload (${payload.notes.length} notes, ${payload.tags.length} tags, ${payload.categories.length} categories) to client ${clientId}`);
+            } else {
+              // Send legacy flat response
+              const notes = db.getAllNotes();
+              const response: InitResponseMessage = {
+                type: 'INIT_RESPONSE',
+                timestamp: Date.now(),
+                clientId,
+                notes,
+              };
+              sendTo(clientId, response);
+              fastify.log.info(`Sent ${notes.length} notes to client ${clientId}`);
+            }
             break;
           }
 
@@ -197,6 +224,120 @@ const syncRoute: FastifyPluginAsync = async (fastify) => {
             break;
           }
 
+          case 'TAG_CREATE': {
+            const tagMsg = message as TagCreateMessage;
+            const created = db.upsertTag(tagMsg.tag);
+            if (created) {
+              fastify.log.info(`Tag ${tagMsg.tag.id} created by client ${clientId}`);
+              broadcast({
+                type: 'TAG_CREATE',
+                timestamp: Date.now(),
+                clientId,
+                tag: created,
+              } as TagCreateMessage, clientId);
+            }
+            break;
+          }
+
+          case 'TAG_UPDATE': {
+            const tagMsg = message as TagUpdateMessage;
+            const updated = db.upsertTag(tagMsg.tag);
+            if (updated) {
+              fastify.log.info(`Tag ${tagMsg.tag.id} updated by client ${clientId}`);
+              broadcast({
+                type: 'TAG_UPDATE',
+                timestamp: Date.now(),
+                clientId,
+                tag: updated,
+              } as TagUpdateMessage, clientId);
+            }
+            break;
+          }
+
+          case 'TAG_DELETE': {
+            const tagMsg = message as TagDeleteMessage;
+            const deleted = db.deleteTag(tagMsg.tagId);
+            if (deleted) {
+              fastify.log.info(`Tag ${tagMsg.tagId} deleted by client ${clientId}`);
+              broadcast({
+                type: 'TAG_DELETE',
+                timestamp: Date.now(),
+                clientId,
+                tagId: tagMsg.tagId,
+              } as TagDeleteMessage, clientId);
+            }
+            break;
+          }
+
+          case 'CATEGORY_CREATE': {
+            const catMsg = message as CategoryCreateMessage;
+            const created = db.upsertCategory(catMsg.category);
+            if (created) {
+              fastify.log.info(`Category ${catMsg.category.id} created by client ${clientId}`);
+              broadcast({
+                type: 'CATEGORY_CREATE',
+                timestamp: Date.now(),
+                clientId,
+                category: created,
+              } as CategoryCreateMessage, clientId);
+            }
+            break;
+          }
+
+          case 'CATEGORY_UPDATE': {
+            const catMsg = message as CategoryUpdateMessage;
+            const updated = db.upsertCategory(catMsg.category);
+            if (updated) {
+              fastify.log.info(`Category ${catMsg.category.id} updated by client ${clientId}`);
+              broadcast({
+                type: 'CATEGORY_UPDATE',
+                timestamp: Date.now(),
+                clientId,
+                category: updated,
+              } as CategoryUpdateMessage, clientId);
+            }
+            break;
+          }
+
+          case 'CATEGORY_DELETE': {
+            const catMsg = message as CategoryDeleteMessage;
+            const deleted = db.deleteCategory(catMsg.categoryId);
+            if (deleted) {
+              fastify.log.info(`Category ${catMsg.categoryId} deleted by client ${clientId}`);
+              broadcast({
+                type: 'CATEGORY_DELETE',
+                timestamp: Date.now(),
+                clientId,
+                categoryId: catMsg.categoryId,
+              } as CategoryDeleteMessage, clientId);
+            }
+            break;
+          }
+
+          case 'RELATION_ADD': {
+            const relMsg = message as RelationAddMessage;
+            if (relMsg.relationName === 'note_tags') {
+              db.linkNoteTag(relMsg.noteId, relMsg.targetId);
+            } else if (relMsg.relationName === 'note_categories') {
+              db.linkNoteCategory(relMsg.noteId, relMsg.targetId);
+            }
+            fastify.log.info(`Relation added: ${relMsg.relationName} ${relMsg.noteId}-${relMsg.targetId} by client ${clientId}`);
+            broadcast(relMsg, clientId);
+            break;
+          }
+
+          case 'RELATION_REMOVE': {
+            const relMsg = message as RelationRemoveMessage;
+            if (relMsg.relationName === 'note_tags') {
+              db.unlinkNoteTag(relMsg.noteId, relMsg.targetId);
+            } else if (relMsg.relationName === 'note_categories') {
+              db.unlinkNoteCategory(relMsg.noteId, relMsg.targetId);
+            }
+            fastify.log.info(`Relation removed: ${relMsg.relationName} ${relMsg.noteId}-${relMsg.targetId} by client ${clientId}`);
+            broadcast(relMsg, clientId);
+            break;
+          }
+
           case 'PING': {
             sendTo(clientId, {
               type: 'PONG',
@@ -209,7 +350,7 @@ const syncRoute: FastifyPluginAsync = async (fastify) => {
             fastify.log.warn(`Unknown message type: ${(message as SyncMessage).type}`);
         }
       } catch (err) {
-        fastify.log.error('Failed to parse WebSocket message:', err);
+        fastify.log.error({ err }, 'Failed to parse WebSocket message');
       }
     });
 
@@ -221,7 +362,7 @@ const syncRoute: FastifyPluginAsync = async (fastify) => {
 
     // 连接错误
     socket.on('error', (err) => {
-      fastify.log.error(`WebSocket error for client ${clientId}:`, err);
+      fastify.log.error({ err }, `WebSocket error for client ${clientId}`);
       connections.delete(clientId);
     });
   });
