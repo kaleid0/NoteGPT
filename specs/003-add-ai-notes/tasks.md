@@ -24,8 +24,8 @@
 - [X] T006 实施 AI 流式代理与 mock LLM (server side prototype) (已完成)
 - [X] T007 添加性能基准测试 (Playwright perf test for AI first-char latency) (已完成)
 - [X] T008 上传并比对 perf 产物到 CI (compare-baseline.js) (已完成)
-- [ ] T009 验证 CI 中 perf 测试能产出 artifacts 并成功上传 (当前正在调试)
-- [ ] T010 为 perf 测试在 CI 中添加更多 debug (文件列出、日志输出) (已完成)
+- [X] T009 验证 CI 中 perf 测试能产出 artifacts 并成功上传 (已尝试修复 workflow)
+- [X] T010 为 perf 测试在 CI 中添加更多 debug (文件列出、日志输出) (已完成)
 
 ---
 
