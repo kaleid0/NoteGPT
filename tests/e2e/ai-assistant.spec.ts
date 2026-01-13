@@ -28,6 +28,8 @@ test('ai assistant modal streams and accept replaces content', async ({ page, ba
   page.on('console', msg => console.log('[PAGE CONSOLE]', msg.type(), msg.text()))
   page.on('pageerror', err => console.log('[PAGE ERROR]', err))
   page.on('crash', () => console.log('[PAGE CRASHED]'))
+  page.on('close', () => console.log('[PAGE CLOSED]'))
+  page.on('requestfailed', req => console.log('[REQUEST FAILED]', req.url(), req.failure()?.errorText ?? ''))
 
   // ensure DB is clean and create an untitled note
   await page.evaluate(() =>
@@ -44,7 +46,7 @@ test('ai assistant modal streams and accept replaces content', async ({ page, ba
   const note = { id: noteId, title: 'Untitled', content: 'hello', createdAt: now, updatedAt: now }
 
   // attempt to write to IndexedDB with a small retry to avoid transient HMR reloads closing the page
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 5; i++) {
     try {
       await page.evaluate((note) =>
         new Promise<void>((res, rej) => {
@@ -70,8 +72,13 @@ test('ai assistant modal streams and accept replaces content', async ({ page, ba
       break
     } catch (err) {
       console.log('[E2E] IndexedDB write failed, retrying', err)
-      await page.waitForTimeout(200)
-      if (i === 1) throw err
+      // if page is closed, report and rethrow
+      if (page.isClosed && page.isClosed()) {
+        console.log('[E2E] Page was closed during IndexedDB write, aborting')
+        throw err
+      }
+      await page.waitForTimeout(500)
+      if (i === 4) throw err
     }
   }
 

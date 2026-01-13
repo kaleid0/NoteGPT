@@ -27,6 +27,8 @@ test('notes CRUD flow', async ({ page, baseURL }) => {
   page.on('console', msg => console.log('[PAGE CONSOLE]', msg.type(), msg.text()))
   page.on('pageerror', err => console.log('[PAGE ERROR]', err))
   page.on('crash', () => console.log('[PAGE CRASHED]'))
+  page.on('close', () => console.log('[PAGE CLOSED]'))
+  page.on('requestfailed', req => console.log('[REQUEST FAILED]', req.url(), req.failure()?.errorText ?? ''))
 
   // ensure DB is clean
   await page.evaluate(() =>
@@ -44,7 +46,7 @@ test('notes CRUD flow', async ({ page, baseURL }) => {
   const note = { id: noteId, title: 'E2E Note', content: 'hello', createdAt: now, updatedAt: now }
 
   // attempt to write to IndexedDB with retries to avoid transient HMR/dev-server restarts closing pages
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 5; i++) {
     try {
       await page.evaluate((note) =>
         new Promise<void>((res, rej) => {
@@ -70,8 +72,12 @@ test('notes CRUD flow', async ({ page, baseURL }) => {
       break
     } catch (err) {
       console.log('[E2E] IndexedDB write failed, retrying', err)
-      await page.waitForTimeout(300)
-      if (i === 2) throw err
+      if (page.isClosed && page.isClosed()) {
+        console.log('[E2E] Page was closed during IndexedDB write, aborting')
+        throw err
+      }
+      await page.waitForTimeout(500)
+      if (i === 4) throw err
     }
   }
 
