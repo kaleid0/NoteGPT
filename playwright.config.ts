@@ -8,6 +8,14 @@ export default defineConfig({
       name: 'chromium',
       use: { browserName: 'chromium' },
     },
+    {
+      name: 'firefox',
+      use: { browserName: 'firefox' },
+    },
+    {
+      name: 'webkit',
+      use: { browserName: 'webkit' },
+    },
   ],
   use: {
     baseURL: process.env.PW_BASE_URL || 'http://localhost:3000',

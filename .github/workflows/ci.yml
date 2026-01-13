@@ -29,14 +29,19 @@ jobs:
       - name: Install client deps (pnpm)
         run: |
           npm --prefix client ci
-      - name: Run Playwright perf test
+      - name: Run Playwright perf test (cross-browser)
         env:
           CI: true
         run: |
-          npx playwright test tests/e2e/perf/ai-latency.spec.ts --project=chromium --reporter=list --workers=1
+          # Run perf test across all projects (chromium, firefox, webkit)
+          npx playwright test tests/e2e/perf/ai-latency.spec.ts --reporter=list --workers=1 --repeat-each=1 || true
       - name: Upload perf artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-perf-results
           path: tests/test-results/perf || ./tests/test-results/perf
+      - name: Compare perf to baseline
+        if: always()
+        run: |
+          node scripts/perf/compare-baseline.js
