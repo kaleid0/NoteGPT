@@ -5,6 +5,21 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
+    proxy: {
+      '/v1': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
+    },
+  },
+  preview: {
+    port: 3000,
+    proxy: {
+      '/v1': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+      },
+    },
   },
   css: {
     modules: {

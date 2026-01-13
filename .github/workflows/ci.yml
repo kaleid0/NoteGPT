@@ -41,6 +41,11 @@ jobs:
       - name: Create test results directory
         run: mkdir -p tests/test-results/perf
 
+      - name: Start backend server
+        run: |
+          cd server && npx tsx src/index.ts &
+          sleep 3
+
       - name: Run Playwright Perf Tests
         env:
           CI: true
