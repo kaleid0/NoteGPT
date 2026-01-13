@@ -31,7 +31,7 @@ test('ai assistant modal streams and accept replaces content', async ({ page, ba
   page.on('close', () => console.log('[PAGE CLOSED]'))
   page.on('requestfailed', req => console.log('[REQUEST FAILED]', req.url(), req.failure()?.errorText ?? ''))
 
-  // ensure DB is clean and create an untitled note
+  // ensure DB is clean
   await page.evaluate(() =>
     new Promise<void>((res) => {
       const req = indexedDB.deleteDatabase('notegpt-db')
@@ -41,46 +41,16 @@ test('ai assistant modal streams and accept replaces content', async ({ page, ba
     })
   )
 
-  const noteId = '000-untitled'
-  const now = new Date().toISOString()
-  const note = { id: noteId, title: 'Untitled', content: 'hello', createdAt: now, updatedAt: now }
+  // create a new note via the UI (more robust than direct IndexedDB writes)
+  await page.goto(base + '/')
+  await page.waitForLoadState('networkidle')
+  await page.click('[aria-label="Create note"]')
+  await page.waitForURL('**/note/*')
+  const url = new URL(page.url())
+  const noteId = url.pathname.split('/').pop() || '000-untitled'
 
-  // attempt to write to IndexedDB with a small retry to avoid transient HMR reloads closing the page
-  for (let i = 0; i < 5; i++) {
-    try {
-      await page.evaluate((note) =>
-        new Promise<void>((res, rej) => {
-          const req = indexedDB.open('notegpt-db', 1)
-          req.onupgradeneeded = () => {
-            const db = req.result
-            if (!db.objectStoreNames.contains('notes')) {
-              const store = db.createObjectStore('notes', { keyPath: 'id' })
-              store.createIndex('by-updated', 'updatedAt')
-            }
-          }
-          req.onsuccess = () => {
-            const db = req.result
-            const tx = db.transaction('notes', 'readwrite')
-            tx.objectStore('notes').put(note)
-            tx.oncomplete = () => res()
-            tx.onerror = () => rej(tx.error)
-          }
-          req.onerror = () => rej(req.error)
-        }),
-        note
-      )
-      break
-    } catch (err) {
-      console.log('[E2E] IndexedDB write failed, retrying', err)
-      // if page is closed, report and rethrow
-      if (page.isClosed && page.isClosed()) {
-        console.log('[E2E] Page was closed during IndexedDB write, aborting')
-        throw err
-      }
-      await page.waitForTimeout(500)
-      if (i === 4) throw err
-    }
-  }
+  // we expect to be on the note detail page
+  await page.waitForLoadState('networkidle')
 
   await page.goto(base + '/note/' + noteId)
   await page.waitForLoadState('networkidle')
