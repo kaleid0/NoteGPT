@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getAllNotes, getNote, upsertNote, deleteNote, Note } from '../lib/db/notes';
 
+/**
+ * 笔记管理 Hook（本地 IndexedDB）
+ * 注意：此 Hook 仅管理本地数据，同步逻辑请使用 SyncContext
+ */
 export function useNotes() {
   const [notes, setNotes] = useState<Note[]>([]);
 
@@ -17,6 +21,7 @@ export function useNotes() {
     async (note: Note) => {
       await upsertNote(note);
       await reload();
+      return note;
     },
     [reload]
   );
@@ -34,6 +39,7 @@ export function useNotes() {
     async (note: Note) => {
       await upsertNote(note);
       await reload();
+      return note;
     },
     [reload]
   );

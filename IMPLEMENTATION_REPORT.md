@@ -115,6 +115,58 @@
 
 **验证**: ✅ 性能测试通过，数据记录到 JSON
 
+### 9. **实时协作编辑 (多端同步)** ✅ *新增*
+
+**日期**: 2026-01-14
+
+**实现内容**:
+- WebSocket 实时同步协议
+- SQLite 服务端持久化存储
+- LWW (Last-Write-Wins) 冲突解决策略
+- 自动重连和心跳机制
+- 连接状态指示器
+
+**架构设计**:
+```
+┌─────────────┐     WebSocket      ┌─────────────┐
+│   客户端1    │ ←───────────────→ │             │
+│  (浏览器A)   │                   │   服务端     │
+└─────────────┘                   │  (Fastify)  │
+                                  │             │
+┌─────────────┐     WebSocket      │  ┌───────┐  │
+│   客户端2    │ ←───────────────→ │  │SQLite │  │
+│  (浏览器B)   │                   │  └───────┘  │
+└─────────────┘                   └─────────────┘
+```
+
+**同步协议消息类型**:
+| 消息类型 | 方向 | 描述 |
+|---------|------|------|
+| INIT | C→S | 客户端请求初始数据 |
+| INIT_RESPONSE | S→C | 服务端返回所有笔记 |
+| CREATE | C→S→C | 创建笔记并广播 |
+| UPDATE | C→S→C | 更新笔记并广播 |
+| DELETE | C→S→C | 删除笔记并广播 |
+| PING/PONG | C↔S | 心跳保活 |
+| ACK | S→C | 操作确认 |
+
+**关键文件**:
+- `shared/sync-protocol.ts` - 共享类型定义
+- `server/src/services/database.ts` - SQLite 数据库服务
+- `server/src/routes/sync.ts` - WebSocket 路由处理
+- `client/src/hooks/useSync.ts` - 客户端同步 Hook
+- `client/src/context/SyncContext.tsx` - 同步状态上下文
+
+**冲突解决策略**:
+- 采用 LWW (Last-Write-Wins) 策略
+- 基于 `updatedAt` 时间戳比较
+- 较新的更新覆盖较旧的更新
+
+**验证**: 
+- ✅ 数据库服务测试 10/10 通过
+- ✅ WebSocket 集成测试脚本验证通过
+- ✅ 多客户端同步测试通过
+
 ---
 
 ## 📝 文档更新
