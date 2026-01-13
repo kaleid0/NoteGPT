@@ -3,3 +3,6 @@ dist/
 build/
 coverage/
 *.min.js
+
+# Test artifacts
+tests/test-results/

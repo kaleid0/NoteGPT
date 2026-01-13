@@ -13,7 +13,7 @@
 
 - [X] T001 初始化 feature 分支和规范文件 (已完成)
 - [X] T002 添加 CI workflow 运行基础测试 (unit/e2e) (已完成)
-- [ ] T003 创建并验证项目忽略文件 (.gitignore, .dockerignore, .prettierignore, .eslintignore)
+- [X] T003 创建并验证项目忽略文件 (.gitignore, .dockerignore, .prettierignore, .eslintignore)
 
 ---
 

@@ -8,3 +8,6 @@ Dockerfile*
 coverage/
 dist/
 build/
+
+# Test artifacts
+tests/test-results/
