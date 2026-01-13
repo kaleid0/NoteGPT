@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Install client deps (pnpm)
+      - name: Install client deps
         run: |
           npm --prefix client ci
       - name: Run Playwright perf test (cross-browser)
@@ -45,6 +45,7 @@ jobs:
         with:
           name: playwright-perf-results
           path: tests/test-results/perf/**
+          if-no-files-found: ignore
       - name: Compare perf to baseline
         if: always()
         run: |
