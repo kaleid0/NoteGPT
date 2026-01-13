@@ -46,17 +46,23 @@ jobs:
           CI: true
           PW_BASE_URL: http://localhost:3000
         run: |
-          # Start backend server in background (from repo root)
-          (cd server && npx tsx src/index.ts) &
+          # Start backend server in background using ts-node-dev
+          npm --prefix server run dev &
           BACKEND_PID=$!
-          sleep 2
+          echo "Started backend server (PID: $BACKEND_PID)"
+          sleep 5
           
           # Start frontend preview server in background
-          (cd client && npm run preview -- --port 3000) &
+          npm --prefix client run preview -- --port 3000 &
           FRONTEND_PID=$!
-          sleep 3
+          echo "Started frontend server (PID: $FRONTEND_PID)"
+          sleep 5
           
-          # Run Playwright tests (from repo root)
+          # Debug: check if servers are running
+          curl -s http://localhost:4000/v1/generate -X POST -d '{}' -H "Content-Type: application/json" || echo "Backend not responding"
+          curl -s http://localhost:3000/ || echo "Frontend not responding"
+          
+          # Run Playwright tests
           npx playwright test tests/e2e/perf/ai-latency.spec.ts --project=chromium --reporter=list --workers=1 || true
           
           # Cleanup
