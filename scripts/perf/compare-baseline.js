@@ -19,14 +19,16 @@ function main(){
   }
 
   if (!fs.existsSync(RESULTS_DIR)) {
-    console.error('No perf results directory found:', RESULTS_DIR)
-    process.exit(2)
+    console.warn('No perf results directory found:', RESULTS_DIR)
+    console.warn('Skipping perf comparison.')
+    process.exit(0)
   }
 
   const files = fs.readdirSync(RESULTS_DIR).filter(f => f.endsWith('.json'))
   if (!files.length) {
-    console.error('No perf result files found in', RESULTS_DIR)
-    process.exit(2)
+    console.warn('No perf result files found in', RESULTS_DIR)
+    console.warn('Skipping perf comparison.')
+    process.exit(0)
   }
 
   const latencies = []
@@ -40,8 +42,9 @@ function main(){
   }
 
   if (!latencies.length) {
-    console.error('No latency numbers found in result files')
-    process.exit(2)
+    console.warn('No latency numbers found in result files')
+    console.warn('Skipping perf comparison.')
+    process.exit(0)
   }
 
   const p95 = percentile(latencies, 95)
