@@ -29,7 +29,6 @@ export default function App() {
                 <Link to="/" style={{ fontWeight: 500, color: 'var(--text-main)' }}>我的笔记</Link>
                 <Link to="/settings" style={{ fontWeight: 500, color: 'var(--text-main)' }}>设置</Link>
               </nav>
-            </div>
             </Container>
           </header>
           <Container as="main">
