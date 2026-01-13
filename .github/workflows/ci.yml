@@ -14,8 +14,14 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
+
+      - name: Install client dependencies
+        run: npm --prefix client ci
+
+      - name: Install server dependencies
+        run: npm --prefix server ci
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
@@ -29,23 +35,31 @@ jobs:
       - name: Run Unit Tests
         run: npm run -w client test:unit || true
 
+      - name: Build client for E2E
+        run: npm --prefix client run build
+
+      - name: Create test results directory
+        run: mkdir -p tests/test-results/perf
+
       - name: Run Playwright Perf Tests
         env:
           CI: true
-        run: |
-          npx playwright test tests/e2e/perf/ai-latency.spec.ts --reporter=list --workers=1 --repeat-each=1 || true
+        run: npx playwright test tests/e2e/perf/ai-latency.spec.ts --project=chromium --reporter=list --workers=1
 
-      - name: "Debug: list artifacts"
+      - name: Debug list test results
         if: always()
         run: |
-          ls -R tests/test-results || echo "No test-results dir"
+          echo "=== test-results directory ==="
+          ls -laR tests/test-results || echo "No test-results dir"
+          echo "=== perf json files ==="
+          find tests -name "*.json" 2>/dev/null || echo "No JSON files"
 
       - name: Upload Perf Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-perf-results
-          path: tests/test-results/perf/**
+          path: tests/test-results/perf/
           if-no-files-found: warn
 
       - name: Compare Perf to Baseline
