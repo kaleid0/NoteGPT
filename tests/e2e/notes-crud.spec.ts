@@ -25,27 +25,37 @@ test('notes CRUD flow', async ({ page, baseURL }) => {
   const now = new Date().toISOString()
   const note = { id: noteId, title: 'E2E Note', content: 'hello', createdAt: now, updatedAt: now }
 
-  await page.evaluate((note) =>
-    new Promise<void>((res, rej) => {
-      const req = indexedDB.open('notegpt-db', 1)
-      req.onupgradeneeded = () => {
-        const db = req.result
-        if (!db.objectStoreNames.contains('notes')) {
-          const store = db.createObjectStore('notes', { keyPath: 'id' })
-          store.createIndex('by-updated', 'updatedAt')
-        }
-      }
-      req.onsuccess = () => {
-        const db = req.result
-        const tx = db.transaction('notes', 'readwrite')
-        tx.objectStore('notes').put(note)
-        tx.oncomplete = () => res()
-        tx.onerror = () => rej(tx.error)
-      }
-      req.onerror = () => rej(req.error)
-    }),
-    note
-  )
+  // attempt to write to IndexedDB with retries to avoid transient HMR/dev-server restarts closing pages
+  for (let i = 0; i < 3; i++) {
+    try {
+      await page.evaluate((note) =>
+        new Promise<void>((res, rej) => {
+          const req = indexedDB.open('notegpt-db', 1)
+          req.onupgradeneeded = () => {
+            const db = req.result
+            if (!db.objectStoreNames.contains('notes')) {
+              const store = db.createObjectStore('notes', { keyPath: 'id' })
+              store.createIndex('by-updated', 'updatedAt')
+            }
+          }
+          req.onsuccess = () => {
+            const db = req.result
+            const tx = db.transaction('notes', 'readwrite')
+            tx.objectStore('notes').put(note)
+            tx.oncomplete = () => res()
+            tx.onerror = () => rej(tx.error)
+          }
+          req.onerror = () => rej(req.error)
+        }),
+        note
+      )
+      break
+    } catch (err) {
+      console.log('[E2E] IndexedDB write failed, retrying', err)
+      await page.waitForTimeout(300)
+      if (i === 2) throw err
+    }
+  }
 
   // navigate to note detail and verify content
   await page.goto(`${base}/note/${noteId}`)

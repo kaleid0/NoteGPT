@@ -19,25 +19,36 @@ test.describe('AI streaming performance', () => {
     const noteId = 'perf-note-1'
     const now = new Date().toISOString()
     const note = { id: noteId, title: 'Perf Note', content: 'hello world', createdAt: now, updatedAt: now }
-    await page.evaluate((note) => {
-      return new Promise<void>((res) => {
-        const req = indexedDB.open('notegpt-db', 1)
-        req.onupgradeneeded = () => {
-          const db = req.result
-          if (!db.objectStoreNames.contains('notes')) {
-            const store = db.createObjectStore('notes', { keyPath: 'id' })
-            store.createIndex('by-updated', 'updatedAt')
-          }
-        }
-        req.onsuccess = () => {
-          const tx = req.result.transaction('notes', 'readwrite')
-          tx.objectStore('notes').put(note)
-          tx.oncomplete = () => res()
-          tx.onerror = () => res()
-        }
-        req.onerror = () => res()
-      })
-    }, note)
+
+    // write with retries to avoid transient failures
+    for (let i = 0; i < 3; i++) {
+      try {
+        await page.evaluate((note) => {
+          return new Promise<void>((res) => {
+            const req = indexedDB.open('notegpt-db', 1)
+            req.onupgradeneeded = () => {
+              const db = req.result
+              if (!db.objectStoreNames.contains('notes')) {
+                const store = db.createObjectStore('notes', { keyPath: 'id' })
+                store.createIndex('by-updated', 'updatedAt')
+              }
+            }
+            req.onsuccess = () => {
+              const tx = req.result.transaction('notes', 'readwrite')
+              tx.objectStore('notes').put(note)
+              tx.oncomplete = () => res()
+              tx.onerror = () => res()
+            }
+            req.onerror = () => res()
+          })
+        }, note)
+        break
+      } catch (err) {
+        console.log('[E2E] IndexedDB write failed, retrying', err)
+        await page.waitForTimeout(300)
+        if (i === 2) throw err
+      }
+    }
 
     await page.goto(`${base}/note/${noteId}`)
     await page.waitForLoadState('networkidle')

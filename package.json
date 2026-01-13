@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "test:unit": "vitest",
-    "test:e2e": "playwright test --project=chromium"
+    "test:e2e": "playwright test --project=chromium --workers=1"
   },
   "devDependencies": {
     "@playwright/test": "^1.30.0",
