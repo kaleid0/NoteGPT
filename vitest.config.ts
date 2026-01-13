@@ -13,7 +13,7 @@ export default defineConfig({
     dedupe: ['react', 'react-dom']
   },
   test: {
-    include: ['tests/unit/**/*.test.{ts,tsx,js}'],
+    include: ['tests/unit/**/*.test.{ts,tsx,js}', 'tests/integration/client/**/*.test.{ts,tsx,js}'],
     environment: 'jsdom',
     globals: true,
     setupFiles: './tests/unit/setup.ts'

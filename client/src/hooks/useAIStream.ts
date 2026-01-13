@@ -58,8 +58,12 @@ export function useAIStream() {
               } else if (parsed.error) {
                 throw new Error(parsed.error);
               }
-            } catch (_e: unknown) {
-              // ignore parse errors
+            } catch (parseErr: unknown) {
+              // Re-throw if it's a real error (not a JSON parse error)
+              if (parseErr instanceof Error && parseErr.message && !parseErr.message.includes('JSON')) {
+                throw parseErr;
+              }
+              // ignore JSON parse errors
             }
           }
         }
