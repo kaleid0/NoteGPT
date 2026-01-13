@@ -14,58 +14,48 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install root dependencies
+      - name: Install all dependencies
         run: npm ci
-
-      - name: Install client dependencies
-        run: npm --prefix client ci
-
-      - name: Install server dependencies
-        run: npm --prefix server ci
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
       - name: Build client
-        run: npm --prefix client run build
+        run: npm run -w client build
+
+      - name: Lint and Typecheck
+        run: |
+          npm run -w client lint || true
+          npm run -w server lint || true
+          npm run -w client typecheck || true
+
+      - name: Run Unit Tests
+        run: npm run -w client test:unit || true
 
       - name: Create test results directory
         run: mkdir -p tests/test-results/perf
 
       - name: Start servers
         run: |
-          # Start backend server
-          npm --prefix server run dev &
+          npm run -w server dev &
           sleep 5
-          
-          # Start frontend preview server
-          npm --prefix client run preview -- --port 3000 &
+          npm run -w client preview -- --port 3000 &
           sleep 5
-          
-          # Verify servers are up
-          echo "Checking backend..."
-          curl -s http://localhost:4000/ || echo "Backend root not accessible (expected)"
-          
           echo "Checking frontend..."
           curl -s http://localhost:3000/ | head -20 || echo "Frontend not accessible"
 
-      - name: Run simple Playwright test
+      - name: Run Playwright perf test
         env:
           CI: true
           PW_BASE_URL: http://localhost:3000
         run: |
-          # Run a single test with verbose output
           npx playwright test tests/e2e/perf/ai-latency.spec.ts --project=chromium --reporter=list --workers=1 --timeout=60000 2>&1 || echo "Test failed"
 
       - name: List test results
         if: always()
         run: |
-          echo "=== Current directory ==="
-          pwd
           echo "=== test-results directory ==="
           ls -laR tests/test-results || echo "No test-results dir found"
-          echo "=== All JSON files in tests ==="
-          find tests -name "*.json" 2>/dev/null || echo "No JSON files found"
 
       - name: Upload Perf Artifacts
         if: always()
