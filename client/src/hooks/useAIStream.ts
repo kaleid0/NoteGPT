@@ -58,18 +58,19 @@ export function useAIStream() {
               } else if (parsed.error) {
                 throw new Error(parsed.error);
               }
-            } catch (e: any) {
+            } catch (_e: unknown) {
               // ignore parse errors
             }
           }
         }
 
         opts?.onComplete?.();
-      } catch (err: any) {
-        if (err.name === 'AbortError') {
+      } catch (err: unknown) {
+        const e = err as Error;
+        if (e.name === 'AbortError') {
           // aborted by caller
         } else {
-          opts?.onError?.(err);
+          opts?.onError?.(e);
         }
       } finally {
         setRunning(false);

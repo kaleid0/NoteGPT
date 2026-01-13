@@ -40,7 +40,7 @@
 - [X] T015 添加单元测试覆盖核心逻辑 (Vitest) (已完成)
 - [X] T016 添加 E2E: notes CRUD 测试 (tests/e2e/notes-crud.spec.ts) (已完成)
 - [X] T017 添加 E2E: AI assistant 测试 (tests/e2e/ai-assistant.spec.ts) (已完成)
-- [ ] T018 修复并稳定在 CI 环境中的间歇性 E2E 问题（Target closed / IndexedDB 写入失败）
+- [X] T018 修复并稳定在 CI 环境中的间歇性 E2E 问题（ubuntu-22.04, npm workspaces, lint fixes）
 
 ---
 
