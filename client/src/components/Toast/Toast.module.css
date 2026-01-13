@@ -90,7 +90,7 @@
   font-size: 12px;
   font-weight: 500;
   color: #fff;
-  background: #3b82f6;
+  background: #1e40af; /* darker blue for contrast */
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -98,8 +98,8 @@
 }
 
 .retryButton:hover {
-  background: #2563eb;
-}
+  background: #16307a;
+} 
 
 .retryButton:focus {
   outline: 2px solid #93c5fd;

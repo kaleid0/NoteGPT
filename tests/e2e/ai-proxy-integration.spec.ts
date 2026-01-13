@@ -30,7 +30,7 @@ test.describe('AI Proxy Integration', () => {
     const base = baseURL ?? 'http://localhost:3000'
 
     // Create a note via UI
-    await page.click('text=新建笔记')
+    await page.click('button[aria-label="Create note"]')
     await page.waitForURL(/\/note\//)
 
     // Fill in content
@@ -59,7 +59,7 @@ test.describe('AI Proxy Integration', () => {
     const base = baseURL ?? 'http://localhost:3000'
 
     // Create a note
-    await page.click('text=新建笔记')
+    await page.click('button[aria-label="Create note"]')
     await page.waitForURL(/\/note\//)
 
     const contentArea = page.locator('textarea, [contenteditable="true"], input[type="text"]').first()
@@ -87,7 +87,7 @@ test.describe('AI Proxy Integration', () => {
     const base = baseURL ?? 'http://localhost:3000'
 
     // Create a note
-    await page.click('text=新建笔记')
+    await page.click('button[aria-label="Create note"]')
     await page.waitForURL(/\/note\//)
 
     const contentArea = page.locator('textarea, [contenteditable="true"], input[type="text"]').first()
@@ -111,7 +111,7 @@ test.describe('AI Proxy Integration', () => {
     const base = baseURL ?? 'http://localhost:3000'
 
     // Create note
-    await page.click('text=新建笔记')
+    await page.click('button[aria-label="Create note"]')
     await page.waitForURL(/\/note\//)
 
     const contentArea = page.locator('textarea, [contenteditable="true"], input[type="text"]').first()
