@@ -5,6 +5,11 @@ import { test, expect } from '@playwright/test'
 test('ai assistant modal streams and accept replaces content', async ({ page, baseURL }) => {
   const base = baseURL ?? 'http://localhost:3000'
   await page.goto(base + '/')
+  await page.waitForLoadState('load')
+  // debug logging
+  page.on('console', msg => console.log('[PAGE CONSOLE]', msg.type(), msg.text()))
+  page.on('pageerror', err => console.log('[PAGE ERROR]', err))
+  page.on('crash', () => console.log('[PAGE CRASHED]'))
 
   // ensure DB is clean and create an untitled note
   await page.evaluate(() =>
@@ -20,29 +25,40 @@ test('ai assistant modal streams and accept replaces content', async ({ page, ba
   const now = new Date().toISOString()
   const note = { id: noteId, title: 'Untitled', content: 'hello', createdAt: now, updatedAt: now }
 
-  await page.evaluate((note) =>
-    new Promise<void>((res, rej) => {
-      const req = indexedDB.open('notegpt-db', 1)
-      req.onupgradeneeded = () => {
-        const db = req.result
-        if (!db.objectStoreNames.contains('notes')) {
-          const store = db.createObjectStore('notes', { keyPath: 'id' })
-          store.createIndex('by-updated', 'updatedAt')
-        }
-      }
-      req.onsuccess = () => {
-        const db = req.result
-        const tx = db.transaction('notes', 'readwrite')
-        tx.objectStore('notes').put(note)
-        tx.oncomplete = () => res()
-        tx.onerror = () => rej(tx.error)
-      }
-      req.onerror = () => rej(req.error)
-    }),
-    note
-  )
+  // attempt to write to IndexedDB with a small retry to avoid transient HMR reloads closing the page
+  for (let i = 0; i < 2; i++) {
+    try {
+      await page.evaluate((note) =>
+        new Promise<void>((res, rej) => {
+          const req = indexedDB.open('notegpt-db', 1)
+          req.onupgradeneeded = () => {
+            const db = req.result
+            if (!db.objectStoreNames.contains('notes')) {
+              const store = db.createObjectStore('notes', { keyPath: 'id' })
+              store.createIndex('by-updated', 'updatedAt')
+            }
+          }
+          req.onsuccess = () => {
+            const db = req.result
+            const tx = db.transaction('notes', 'readwrite')
+            tx.objectStore('notes').put(note)
+            tx.oncomplete = () => res()
+            tx.onerror = () => rej(tx.error)
+          }
+          req.onerror = () => rej(req.error)
+        }),
+        note
+      )
+      break
+    } catch (err) {
+      console.log('[E2E] IndexedDB write failed, retrying', err)
+      await page.waitForTimeout(200)
+      if (i === 1) throw err
+    }
+  }
 
   await page.goto(base + '/note/' + noteId)
+  await page.waitForLoadState('networkidle')
   // we expect the note detail page to show an editor textarea
   const ta = page.locator('textarea[aria-label="Note editor"]')
   await expect(ta).toBeVisible()

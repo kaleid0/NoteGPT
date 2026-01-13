@@ -94,7 +94,7 @@ description: "任务清单: Web 端 AI 笔记应用 (001-add-ai-notes) — 按�
 - [x] T041 [US2] 将 `AIStreamModal` 的 “接受” 操作实现为：调用上层回调替换选中文本或整文，总是在本地状态中执行，直到确认保存到数据库
   - 文件: `client/src/components/AIStreamModal/AIStreamModal.tsx`
 - [x] T042 [US2] 将 “丢弃” 实现为关闭 Modal 并释放流资源
-- [ ] T043 [US2] 在 `client/src/hooks/useNotes.ts` 中实现可原子替换被选中文本的 API（用于“接受”操作）
+- [x] T043 [US2] 在 `client/src/hooks/useNotes.ts` 中实现可原子替换被选中文本的 API（用于“接受”操作）
 - [ ] T044 [US2] 实现客户端对流式数据的度量与记录（首字符延迟）并上报到监控
 - [ ] T045 [US2] 在 server 端实现检验选区长度与分段处理策略，防止超长请求导致失败 `server/src/services/segmenter.ts`
 - [ ] T046 [US2] 在 UI 中实现错误友好提示与重试按钮 `client/src/components/Toast/Toast.tsx`

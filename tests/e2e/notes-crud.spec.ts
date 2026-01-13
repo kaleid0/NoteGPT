@@ -4,6 +4,11 @@ import { test, expect } from '@playwright/test'
 test('notes CRUD flow', async ({ page, baseURL }) => {
   const base = baseURL ?? 'http://localhost:5173'
   await page.goto(base + '/')
+  await page.waitForLoadState('load')
+  // debug logging
+  page.on('console', msg => console.log('[PAGE CONSOLE]', msg.type(), msg.text()))
+  page.on('pageerror', err => console.log('[PAGE ERROR]', err))
+  page.on('crash', () => console.log('[PAGE CRASHED]'))
 
   // ensure DB is clean
   await page.evaluate(() =>
@@ -86,5 +91,5 @@ test('notes CRUD flow', async ({ page, baseURL }) => {
 
   // reload and expect to land on the notes list (Notes header present)
   await page.reload()
-  await expect(page.locator('text=Notes')).toBeVisible()
+  await expect(page.locator('h1:has-text("Notes")')).toBeVisible()
 })

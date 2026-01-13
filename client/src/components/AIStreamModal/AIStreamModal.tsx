@@ -27,7 +27,7 @@ export default function AIStreamModal({ input, onAccept, onDiscard }: Props) {
   return (
     <div className={styles.overlay} role="dialog" aria-modal="true">
       <div className={styles.modal}>
-        <div className={styles.content}>{text || (running ? 'Streaming...' : 'No content')}</div>
+        <div className={`${styles.content} ai-stream-content`}>{text || (running ? 'Streaming...' : 'No content')}</div>
         <div className={styles.controls}>
           <button
             onClick={() => {

@@ -19,5 +19,24 @@ jobs:
           npm run -w client lint || true
           npm run -w server lint || true
           npm run -w client typecheck || true
-      - name: Run unit tests (placeholder)
-        run: echo "No unit tests yet"
+      - name: Run unit tests
+        run: |
+          npm run -w client test:unit || true
+      - name: Run E2E perf tests (Playwright)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install client deps (pnpm)
+        run: |
+          npm --prefix client ci
+      - name: Run Playwright perf test
+        env:
+          CI: true
+        run: |
+          npx playwright test tests/e2e/perf/ai-latency.spec.ts --project=chromium --reporter=list
+      - name: Upload perf artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-perf-results
+          path: tests/test-results/perf || ./tests/test-results/perf

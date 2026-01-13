@@ -32,7 +32,7 @@ export default function NoteDetail() {
   function handleChange(content: string) {
     if (!note) return;
     const updated: Note = { ...note, content, updatedAt: new Date().toISOString() };
-    upsertNote(updated).then(() => setNote(updated));
+    update(updated).then(() => setNote(updated));
   }
 
   // TODO AI 不可用（未设置API）时的处理
