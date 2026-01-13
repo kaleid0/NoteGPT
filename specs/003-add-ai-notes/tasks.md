@@ -46,7 +46,7 @@
 
 ## 阶段 4: 集成与完善
 
-- [ ] T019 为 perf 测试添加跨浏览器基线 & traces/screenshots (tests/e2e/perf)
+- [X] T019 为 perf 测试添加跨浏览器基线 & traces/screenshots (tests/e2e/perf)
 - [ ] T020 将 perf 比较改为基于历史基线（可按浏览器分开存储）
 - [ ] T021 将性能回归检测集成到 PR gating 或者发布流程（可选）
 - [ ] T022 完善 auth 代理/中间件（API key 管理、账号配置示例）

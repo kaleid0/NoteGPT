@@ -18,7 +18,7 @@ jobs:
         run: npm ci
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Build client
         run: npm run -w client build
@@ -44,12 +44,12 @@ jobs:
           echo "Checking frontend..."
           curl -s http://localhost:3000/ | head -20 || echo "Frontend not accessible"
 
-      - name: Run Playwright perf test
+      - name: Run Playwright perf test (all browsers)
         env:
           CI: true
           PW_BASE_URL: http://localhost:3000
         run: |
-          npx playwright test tests/e2e/perf/ai-latency.spec.ts --project=chromium --reporter=list --workers=1 --timeout=60000 2>&1 || echo "Test failed"
+          npx playwright test tests/e2e/perf/ai-latency.spec.ts --reporter=list --workers=1 --timeout=60000 --trace=on-first-retry --screenshot=on 2>&1 || echo "Test failed"
 
       - name: List test results
         if: always()
@@ -64,6 +64,14 @@ jobs:
           name: playwright-perf-results
           path: tests/test-results/perf/
           if-no-files-found: warn
+
+      - name: Upload Playwright traces and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/
+          if-no-files-found: ignore
 
       - name: Compare Perf to Baseline
         if: always()
