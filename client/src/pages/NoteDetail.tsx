@@ -24,7 +24,10 @@ export default function NoteDetail() {
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout>>();
   // 跟踪本地是否正在编辑（避免远程更新覆盖当前输入）
   const isEditingRef = useRef(false);
+  // 跟踪是否正在编辑标题
+  const isEditingTitleRef = useRef(false);
   const lastLocalUpdateRef = useRef(0);
+  const [title, setTitle] = useState<string>('');
 
   // 加载笔记
   const loadNote = useCallback(async () => {
@@ -48,8 +51,8 @@ export default function NoteDetail() {
     // 只处理当前笔记的更新
     if (lastUpdatedNote.id !== id) return;
     
-    // 如果本地正在编辑，或者本地更新比远程更新更新，则忽略
-    if (isEditingRef.current) {
+    // 如果本地正在编辑内容或标题，或者本地更新比远程更新更新，则忽略
+    if (isEditingRef.current || isEditingTitleRef.current) {
       console.log('Ignoring remote update while editing');
       return;
     }
@@ -60,6 +63,7 @@ export default function NoteDetail() {
     if (remoteUpdateTime > localUpdateTime) {
       console.log('Applying remote update to note:', lastUpdatedNote.id);
       setNote(lastUpdatedNote);
+      setTitle(lastUpdatedNote.title || '');
     }
   }, [lastUpdatedNote, id]);
 
@@ -71,7 +75,28 @@ export default function NoteDetail() {
     }
   }, [lastDeletedNoteId, id, navigate]);
 
+  // 同步标题状态（当笔记变化时，除非正在编辑标题）
+  useEffect(() => {
+    if (!note) return;
+    if (!isEditingTitleRef.current) {
+      setTitle(note.title || '');
+    }
+  }, [note]);
+
   if (!note) return <div style={{ padding: 16 }}>Loading...</div>;
+
+  async function saveTitle() {
+    if (!note) return;
+    isEditingTitleRef.current = false;
+    const newTitle = (title || '').trim();
+    // 如果标题没有变化，不做任何操作
+    if (newTitle === (note.title || '')) return;
+    const updated: Note = { ...note, title: newTitle, updatedAt: new Date().toISOString() };
+    await update(updated);
+    await syncUpdate(updated);
+    setNote(updated);
+    lastLocalUpdateRef.current = Date.now();
+  }
 
   function handleChange(content: string) {
     if (!note) return;
@@ -143,7 +168,40 @@ export default function NoteDetail() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h1 style={{ fontSize: '1.5rem' }}>{note.title || 'Untitled'}</h1>
+        <input
+          aria-label="Note title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onFocus={() => { isEditingTitleRef.current = true; }}
+          onBlur={async () => { await saveTitle(); }}
+          onKeyDown={async (e) => {
+            if (e.key === 'Enter') {
+              await saveTitle();
+              (e.target as HTMLInputElement).blur();
+            }
+          }}
+          placeholder="无标题"
+          style={{
+            fontSize: '1.5rem',
+            padding: '4px 8px',
+            border: '1px solid transparent',
+            borderRadius: '6px',
+            flex: 1,
+            marginRight: '1rem',
+            background: 'transparent',
+            transition: 'border-color 0.2s, background 0.2s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-color)';
+            e.currentTarget.style.background = 'var(--card-bg)';
+          }}
+          onMouseLeave={(e) => {
+            if (document.activeElement !== e.currentTarget) {
+              e.currentTarget.style.borderColor = 'transparent';
+              e.currentTarget.style.background = 'transparent';
+            }
+          }}
+        />
         <AIButton onClick={handleAIProcess} />
       </div>
       
