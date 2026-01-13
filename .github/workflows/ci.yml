@@ -41,15 +41,27 @@ jobs:
       - name: Create test results directory
         run: mkdir -p tests/test-results/perf
 
-      - name: Start backend server
-        run: |
-          cd server && npx tsx src/index.ts &
-          sleep 3
-
-      - name: Run Playwright Perf Tests
+      - name: Start servers and run Playwright tests
         env:
           CI: true
-        run: npx playwright test tests/e2e/perf/ai-latency.spec.ts --project=chromium --reporter=list --workers=1
+          PW_BASE_URL: http://localhost:3000
+        run: |
+          # Start backend server in background (from repo root)
+          (cd server && npx tsx src/index.ts) &
+          BACKEND_PID=$!
+          sleep 2
+          
+          # Start frontend preview server in background
+          (cd client && npm run preview -- --port 3000) &
+          FRONTEND_PID=$!
+          sleep 3
+          
+          # Run Playwright tests (from repo root)
+          npx playwright test tests/e2e/perf/ai-latency.spec.ts --project=chromium --reporter=list --workers=1 || true
+          
+          # Cleanup
+          kill $FRONTEND_PID 2>/dev/null || true
+          kill $BACKEND_PID 2>/dev/null || true
 
       - name: Debug list test results
         if: always()
