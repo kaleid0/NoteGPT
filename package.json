@@ -1,5 +1,9 @@
 {
   "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
     "test:unit": "vitest",
     "test:e2e": "playwright test --project=chromium --workers=1"
