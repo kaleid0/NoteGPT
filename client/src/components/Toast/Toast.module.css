@@ -17,6 +17,11 @@
   transform: translateX(100%);
 }
 
+.exiting {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;

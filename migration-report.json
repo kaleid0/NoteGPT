@@ -25,9 +25,10 @@
   },
   {
     "file": "client/src/components/Toast/Toast.tsx",
-    "applied": false,
+    "applied": true,
     "notes": [
-      "Skipped complex template expression with non-styles interpolation; manual review required"
+      "Converted template-literal className usages to module-safe joins",
+      "Added explicit .exiting class to Toast.module.css"
     ]
   }
 ]

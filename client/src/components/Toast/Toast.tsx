@@ -71,7 +71,7 @@ export const Toast: React.FC<ToastProps> = ({
 
   return (
     <div
-      className={`${styles.toast} ${styles[type]} ${isExiting ? styles.exiting : ''}`}
+      className={[styles.toast, styles[type], isExiting ? styles.exiting : ''].filter(Boolean).join(' ')}
       role="alert"
       aria-live="polite"
     >
@@ -122,7 +122,7 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({
   position = 'top-right',
 }) => {
   return (
-    <div className={`${styles.container} ${styles[position]}`}>
+    <div className={[styles.container, styles[position]].filter(Boolean).join(' ')}>
       {toasts.map((toast) => (
         <Toast
           key={toast.id}
