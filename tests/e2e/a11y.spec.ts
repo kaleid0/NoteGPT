@@ -20,6 +20,9 @@ test.describe('Accessibility (a11y) checks', () => {
     
     // Wait for redirect or modal (assuming redirect to /note/:id)
     await page.waitForURL(/\/note\//);
+    
+    // Wait for content (h1) to ensure we are out of loading state
+    await page.waitForSelector('h1');
 
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
     

@@ -1,15 +1,21 @@
-type Event = { type: string; payload: any; ts: number }
+type EventPayload = Record<string, unknown>
 
-const events: Event[] = []
+interface AuditEvent {
+  type: string
+  payload: EventPayload
+  ts: number
+}
 
-export function logEvent(type: string, payload: any) {
+const events: AuditEvent[] = []
+
+export function logEvent(type: string, payload: EventPayload): void {
   events.push({ type, payload, ts: Date.now() })
 }
 
-export function getEvents() {
+export function getEvents(): AuditEvent[] {
   return events.slice()
 }
 
-export function clearEvents() {
+export function clearEvents(): void {
   events.length = 0
 }

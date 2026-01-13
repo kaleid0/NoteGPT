@@ -9,12 +9,11 @@
     "lint": "eslint './src/**/*.{ts,tsx}' --max-warnings=0"
   },
   "dependencies": {
-    "fastify": "^4.0.0",
-    "node-fetch": "^3.0.0"
+    "fastify": "^4.0.0"
   },
   "devDependencies": {
+    "@types/node": "^18.0.0",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.0.0",
-    "@types/node": "^18.0.0"
+    "typescript": "^5.0.0"
   }
 }

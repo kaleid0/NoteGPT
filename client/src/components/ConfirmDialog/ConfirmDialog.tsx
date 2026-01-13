@@ -1,5 +1,3 @@
-import React from 'react'
-
 export default function ConfirmDialog({ title, onConfirm, onCancel }: { title?: string; onConfirm: ()=>void; onCancel: ()=>void }) {
   return (
     <div role="dialog" aria-modal="true" style={{ padding: 16, background: '#fff', borderRadius: 8 }}>

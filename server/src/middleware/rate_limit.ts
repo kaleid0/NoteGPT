@@ -1,14 +1,14 @@
-import { FastifyPluginAsync } from 'fastify'
+import { FastifyPluginAsync, FastifyRequest, FastifyReply } from 'fastify'
 
 interface Entry { count: number; windowStart: number }
 
-const rateLimitPlugin: FastifyPluginAsync = async (fastify, opts) => {
+const rateLimitPlugin: FastifyPluginAsync = async (fastify, _opts): Promise<void> => {
   const windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS || 60000)
   const max = Number(process.env.RATE_LIMIT_MAX || 10)
 
   const store = new Map<string, Entry>()
 
-  fastify.addHook('onRequest', async (request, reply) => {
+  fastify.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
     const key = (request.headers['x-api-key'] as string) || (request.ip || 'anon')
     const now = Date.now()
     const cur = store.get(key)

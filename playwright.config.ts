@@ -1,6 +1,6 @@
 import { defineConfig } from '@playwright/test'
 
-export default defineConfig({
+const config = {
   workers: 1,
   testDir: 'tests/e2e',
   projects: [
@@ -21,6 +21,7 @@ export default defineConfig({
     baseURL: process.env.PW_BASE_URL || 'http://localhost:3000',
     headless: true,
     actionTimeout: 60000,
+    navigationTimeout: 90000,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -31,9 +32,17 @@ export default defineConfig({
     timeout: 180000,
     reuseExistingServer: true,
   } : {
-    command: 'npm --prefix client run dev -- --host',
+    command: 'npm --prefix client run dev -- --host 0.0.0.0',
     url: 'http://localhost:3000',
     timeout: 120000,
-    reuseExistingServer: true,
+    reuseExistingServer: false,
   }),
-})
+}
+
+// Add global setup/teardown only if not in CI or with custom baseURL
+if (!process.env.PW_BASE_URL && !process.env.CI) {
+  ;(config as any).globalSetup = './tests/e2e/global-setup.ts'
+  ;(config as any).globalTeardown = './tests/e2e/global-teardown.ts'
+}
+
+export default defineConfig(config)

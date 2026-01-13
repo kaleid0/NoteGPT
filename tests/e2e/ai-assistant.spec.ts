@@ -72,8 +72,9 @@ test('ai assistant modal streams and accept replaces content', async ({ page, ba
   await page.waitForTimeout(500)
 
   // click Accept
-  await page.click('text=接受')
+  await page.click('button:has-text("接受")')
 
-  // expect textarea content changed (mock will generate something)
-  await expect(ta).not.toHaveText('')
+  // expect textarea content changed (placeholder "Hello world" was filled, AI should replace it)
+  await expect(ta).not.toHaveValue('')
+  await expect(ta).not.toHaveValue('Hello world')
 })

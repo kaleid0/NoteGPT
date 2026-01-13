@@ -28,6 +28,10 @@ pnpm-debug.log*
 # Other
 /.parcel-cache
 /.turbo
+.vscode/
+.github/
+.specify/
+specs/
 
 # Test artifacts
 tests/test-results/

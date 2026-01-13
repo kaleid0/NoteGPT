@@ -7,23 +7,34 @@ export type UseAIStreamOptions = {
   onComplete?: () => void;
 };
 
+export type RequestLLM = {
+  apiKey?: string
+  baseUrl?: string
+  model?: string
+  promptTemplate?: string
+}
+
 export function useAIStream() {
   const controllerRef = useRef<AbortController | null>(null);
   const [running, setRunning] = useState(false);
   const [firstCharMs, setFirstCharMs] = useState<number | null>(null);
 
   const start = useCallback(
-    async (input: string, opts?: UseAIStreamOptions) => {
+    async (input: string, opts?: UseAIStreamOptions, requestLLM?: RequestLLM) => {
       if (running) return;
       controllerRef.current = new AbortController();
       setRunning(true);
       opts?.onStart?.();
       const startedAt = performance.now();
       try {
+        const payload: any = { input }
+        if (requestLLM) payload.llm = { apiKey: requestLLM.apiKey, baseUrl: requestLLM.baseUrl, model: requestLLM.model }
+        if (requestLLM?.promptTemplate) payload.promptTemplate = requestLLM.promptTemplate
+
         const res = await fetch('/v1/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ input }),
+          body: JSON.stringify(payload),
           signal: controllerRef.current.signal,
         });
         if (!res.ok || !res.body) {

@@ -52,6 +52,10 @@
 - [X] T022 完善 auth 代理/中间件（API key 管理、账号配置示例）
 - [X] T023 更新 quickstart.md 与文档（如何运行 perf、如何收集 artifacts）
 - [X] T024 添加更多集成测试覆盖（如代理的端到端流式场景）
+- [X] T025 实现 LLM 多提供商支持（DeepSeek、百炼等）并创建 LLMSettings 组件 (已完成)
+- [X] T026 实现 Prompt 模板编辑器与 {{input}} 占位符替换 (已完成)
+- [X] T027 添加 E2E 测试验证 Settings 组件功能 (tests/e2e/settings.spec.ts) (已完成)
+- [X] T028 更新 quickstart.md 文档说明 LLM 设置和多提供商配置 (已完成)
 
 ---
 

@@ -45,14 +45,16 @@ test.describe('AI Proxy Integration', () => {
     const modal = page.locator('[role="dialog"]')
     await expect(modal).toBeVisible({ timeout: 10000 })
 
-    // Wait for streaming content
+    // Wait for streaming content to be long enough
     const content = modal.locator('.ai-stream-content')
-    await expect(content).toContainText(/.+/, { timeout: 15000 })
+    await expect(async () => {
+      const text = await content.textContent()
+      expect(text?.length).toBeGreaterThan(10)
+    }, { timeout: 15000 }).toPass()
 
     // Should have some generated text
     const text = await content.textContent()
     expect(text).toBeTruthy()
-    expect(text!.length).toBeGreaterThan(10)
   })
 
   test('should handle accept button to update note', async ({ page, baseURL }) => {
