@@ -21,6 +21,24 @@ const PROVIDER_DEFAULTS: Record<string, Omit<LLMConfig, 'provider' | 'apiKey' | 
   },
 }
 
+const DEFAULT_PROMPT_TEMPLATE = `<role>
+你是一位写作助手，帮助用户整理和润色笔记内容。
+用户会输入一段笔记，你需要根据用户的需求（如：扩展、重写、润色、总结等）对内容进行处理。
+</role>
+
+<requirements>
+- 在不改变原始含义的前提下进行优化
+- 润色语言，使其更自然流畅
+- 扩展内容，增加细节或解释
+- 重写为markdown格式，使结构更清晰
+- 总结，提炼重点
+- 不要虚构事实，不要改变用户立场
+- 输出只包含最终内容，不包含解释说明
+</requirements>
+
+<user_input>
+{{input}}
+</user_input>`
 export default function LLMSettings() {
   const [cfg, setCfg] = useState<LLMConfig>({})
   const [saved, setSaved] = useState(false)
@@ -29,7 +47,7 @@ export default function LLMSettings() {
     const loaded = loadLLMConfig()
     // Ensure promptTemplate has a default value
     if (!loaded.promptTemplate) {
-      loaded.promptTemplate = '请根据以下内容生成：\n\n{{input}}'
+      loaded.promptTemplate = DEFAULT_PROMPT_TEMPLATE
     }
     setCfg(loaded)
   }, [])
@@ -116,10 +134,10 @@ export default function LLMSettings() {
           <textarea 
             id="promptTemplate"
             className={styles.textarea}
-            value={cfg.promptTemplate || '请根据以下内容生成：\n\n{{input}}'} 
+            value={cfg.promptTemplate || DEFAULT_PROMPT_TEMPLATE} 
             onChange={(e) => update('promptTemplate', e.target.value)}
           />
-          <small className={styles.hint}>示例: 请根据以下内容生成摘要：\n\n{'{{input}}'}</small>
+          <small className={styles.hint}>示例: 使用模板中的 {'{{input}}'} 占位符替换为用户输入的笔记。</small>
         </div>
 
         <div className={styles.actions}>

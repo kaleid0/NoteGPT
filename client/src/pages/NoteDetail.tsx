@@ -1,5 +1,8 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeSanitize from 'rehype-sanitize';
 import { getNote, Note } from '../lib/db/notes';
 import NoteEditor from '../components/NoteEditor/NoteEditor';
 import AIButton from '../components/AIButton/AIButton';
@@ -16,6 +19,7 @@ export default function NoteDetail() {
   const navigate = useNavigate();
   const [note, setNote] = useState<Note | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   const [modalInput, setModalInput] = useState('');
   const { replaceRange, update } = useNotes();
   const { syncUpdate, lastUpdatedNote, lastDeletedNoteId } = useSyncContext();
@@ -167,7 +171,7 @@ export default function NoteDetail() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', marginBottom: '1rem' }}>
         <input
           aria-label="Note title"
           value={title}
@@ -186,8 +190,8 @@ export default function NoteDetail() {
             padding: '4px 8px',
             border: '1px solid transparent',
             borderRadius: '6px',
-            flex: 1,
-            marginRight: '1rem',
+            flex: '1 1 auto',
+            minWidth: '120px',
             background: 'transparent',
             transition: 'border-color 0.2s, background 0.2s',
           }}
@@ -202,10 +206,47 @@ export default function NoteDetail() {
             }
           }}
         />
-        <AIButton onClick={handleAIProcess} />
+        <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+          <button
+            onClick={() => setShowPreview((prev) => !prev)}
+            aria-pressed={showPreview}
+            aria-label={showPreview ? '切换到编辑模式' : '切换到预览模式'}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '6px',
+              border: '1px solid var(--border-color)',
+              background: showPreview ? 'var(--primary-color)' : 'var(--card-bg)',
+              color: showPreview ? '#fff' : 'inherit',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              transition: 'background 0.2s, color 0.2s',
+            }}
+          >
+            {showPreview ? '编辑' : '预览'}
+          </button>
+          <AIButton onClick={handleAIProcess} />
+        </div>
       </div>
-      
-      <NoteEditor content={note.content} onChange={handleChange} />
+
+      {showPreview ? (
+        <div
+          style={{
+            padding: '1rem',
+            border: '1px solid var(--border-color)',
+            borderRadius: '8px',
+            background: 'var(--card-bg)',
+            minHeight: '300px',
+            lineHeight: 1.6,
+            overflowWrap: 'break-word',
+          }}
+        >
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
+            {note.content}
+          </ReactMarkdown>
+        </div>
+      ) : (
+        <NoteEditor content={note.content} onChange={handleChange} />
+      )}
 
       {showModal && (
         <AIStreamModal

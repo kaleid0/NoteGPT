@@ -30,13 +30,13 @@ describe('AIStreamModal', () => {
     )
 
     // initially streaming placeholder should be shown (Chinese text)
-    expect(screen.getByText('正在生成内容...')).toBeInTheDocument()
+    expect(screen.getByText('正在生成更智能的内容...')).toBeInTheDocument()
 
     // after start ran, text should update (wait for async deltas)
     expect(await screen.findByText((c) => c.includes('hello') && c.includes('world'))).toBeInTheDocument()
 
     // Accept should be enabled (running true but text present)
-    const acceptBtn = screen.getByText('接受') as HTMLButtonElement
+    const acceptBtn = screen.getByText('采用') as HTMLButtonElement
     expect(acceptBtn.disabled).toBe(false)
 
     fireEvent.click(acceptBtn)
@@ -46,7 +46,7 @@ describe('AIStreamModal', () => {
     expect(accepted).toEqual(expect.stringContaining('world'))
 
     // test discard
-    fireEvent.click(screen.getByText('丢弃'))
+    fireEvent.click(screen.getByText('取消'))
     expect(stop).toHaveBeenCalled()
     expect(onDiscard).toHaveBeenCalled()
   })
