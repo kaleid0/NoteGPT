@@ -19,11 +19,9 @@ jobs:
           npm run -w client lint || true
           npm run -w server lint || true
           npm run -w client typecheck || true
-
       - name: Run unit tests
         run: |
           npm run -w client test:unit || true
-
       - name: Run E2E perf tests (Playwright)
         uses: actions/setup-node@v4
         with:
@@ -37,12 +35,10 @@ jobs:
         run: |
           npx playwright test tests/e2e/perf/ai-latency.spec.ts --reporter=list --workers=1 --repeat-each=1 || true
 
-      - name: Debug: list perf result files
+      - name: "Debug: list perf result files"
         if: always()
         run: |
-          echo "PWD: $(pwd)"
-          ls -la tests/test-results/perf || true
-
+          ls -R tests/test-results || true
       - name: Upload perf artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -53,4 +49,3 @@ jobs:
         if: always()
         run: |
           node scripts/perf/compare-baseline.js
-# trigger
