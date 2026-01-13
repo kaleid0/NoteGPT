@@ -4,6 +4,24 @@ import { test, expect } from '@playwright/test'
 
 test('ai assistant modal streams and accept replaces content', async ({ page, baseURL }) => {
   const base = baseURL ?? 'http://localhost:3000'
+  // ensure IndexedDB exists before the app loads to avoid transient page closure during HMR/preview
+  await page.addInitScript(() => {
+    try {
+      const req = indexedDB.open('notegpt-db', 1)
+      req.onupgradeneeded = () => {
+        const db = req.result
+        if (!db.objectStoreNames.contains('notes')) {
+          const store = db.createObjectStore('notes', { keyPath: 'id' })
+          store.createIndex('by-updated', 'updatedAt')
+        }
+      }
+      req.onsuccess = () => req.result.close()
+      req.onerror = () => {}
+    } catch (e) {
+      // ignore in environments without IndexedDB
+    }
+  })
+
   await page.goto(base + '/')
   await page.waitForLoadState('load')
   // debug logging
