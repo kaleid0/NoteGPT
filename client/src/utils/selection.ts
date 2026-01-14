@@ -5,11 +5,18 @@ export type SelectionInfo = {
   isTextarea: boolean
 }
 
+/**
+ * 获取当前选中的文本信息
+ */
 export function getSelectionInfo(): SelectionInfo {
   const active = document.activeElement as HTMLElement | null
 
   // textarea or input selection
-  if (active && (active.tagName === 'TEXTAREA' || (active.tagName === 'INPUT' && (active as HTMLInputElement).type === 'text'))) {
+  if (
+    active &&
+    (active.tagName === 'TEXTAREA' ||
+      (active.tagName === 'INPUT' && (active as HTMLInputElement).type === 'text'))
+  ) {
     const ta = active as HTMLTextAreaElement
     const start = ta.selectionStart ?? 0
     const end = ta.selectionEnd ?? 0

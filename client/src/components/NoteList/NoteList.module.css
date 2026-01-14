@@ -47,6 +47,7 @@
   color: var(--text-muted);
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -75,11 +76,21 @@
 /* Module-scoped utility classes for buttons used in this component */
 .primary {
   background-color: var(--primary-color);
-  color: white;
+  color: rgb(255, 255, 255);
   border: none;
   padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
+}
+
+/* 当鼠标悬停时，稍微加深一点颜色 */
+.primary:hover {
+  filter: brightness(0.9);
+}
+
+/* 当点击瞬间，稍微缩小一点点 */
+.primary:active {
+  transform: scale(0.9);
 }
 
 .danger {
