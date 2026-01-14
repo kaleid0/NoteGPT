@@ -21,7 +21,12 @@ export async function* streamChatCompletion(
 ): AsyncGenerator<string, void, unknown> {
   const apiKeyToUse = options.apiKey ?? apiKey
   const base = options.baseUrl ?? 'https://api.openai.com'
-  const url = base.replace(/\/$/, '') + '/v1/chat/completions'
+  let url: string
+  if (base === 'https://dashscope.aliyuncs.com/compatible-mode/v1') {
+    url = base.replace(/\/$/, '') + '/chat/completions'
+  } else {
+    url = base.replace(/\/$/, '') + '/v1/chat/completions'
+  }
   const body = {
     model: options.model ?? 'gpt-3.5-turbo',
     messages: [{ role: 'user', content: input }],
