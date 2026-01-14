@@ -1,6 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { vi, describe, it, beforeEach, expect } from 'vitest'
 import NoteList from '../../../client/src/components/NoteList/NoteList'
 import * as syncMod from '../../../client/src/context/SyncContext'
 import * as toastMod from '../../../client/src/components/Toast'
@@ -22,7 +23,7 @@ describe('NoteList', () => {
     vi.mocked(syncMod.useSyncContext).mockReturnValue({
       syncDelete: vi.fn().mockResolvedValue(undefined),
     } as any)
-    
+
     vi.mocked(toastMod.useGlobalToast).mockReturnValue({
       success: vi.fn(),
       error: vi.fn(),
@@ -32,7 +33,7 @@ describe('NoteList', () => {
   it('renders notes and calls onCreate', () => {
     const notes = [
       { id: '1', title: 'A', content: 'Hello world' },
-      { id: '2', title: 'B', content: 'Second note content' }
+      { id: '2', title: 'B', content: 'Second note content' },
     ]
     const onCreate = vi.fn()
 
@@ -51,16 +52,14 @@ describe('NoteList', () => {
   })
 
   it('shows confirm dialog and calls syncDelete when delete is confirmed', async () => {
-    const notes = [
-      { id: 'note-1', title: 'Test Note', content: 'Test content' }
-    ]
+    const notes = [{ id: 'note-1', title: 'Test Note', content: 'Test content' }]
     const syncDelete = vi.fn().mockResolvedValue(undefined)
     const showToastSuccess = vi.fn()
-    
+
     vi.mocked(syncMod.useSyncContext).mockReturnValue({
       syncDelete,
     } as any)
-    
+
     vi.mocked(toastMod.useGlobalToast).mockReturnValue({
       success: showToastSuccess,
       error: vi.fn(),
@@ -91,11 +90,9 @@ describe('NoteList', () => {
   })
 
   it('cancels delete when cancel is clicked', async () => {
-    const notes = [
-      { id: 'note-2', title: 'Another Note', content: 'Content' }
-    ]
+    const notes = [{ id: 'note-2', title: 'Another Note', content: 'Content' }]
     const syncDelete = vi.fn()
-    
+
     vi.mocked(syncMod.useSyncContext).mockReturnValue({
       syncDelete,
     } as any)

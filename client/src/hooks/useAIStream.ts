@@ -27,12 +27,17 @@ type AIStreamRequest = {
 export function useAIStream() {
   const controllerRef = useRef<AbortController | null>(null)
   const [running, setRunning] = useState(false)
+  const runningRef = useRef(false)
+  const activeRequestIdRef = useRef(0)
   const [firstCharMs, setFirstCharMs] = useState<number | null>(null)
 
   const start = useCallback(
     async (input: string, opts?: UseAIStreamOptions, requestLLM?: RequestLLM) => {
-      if (running) return
-      controllerRef.current = new AbortController()
+      if (runningRef.current) return
+      runningRef.current = true
+      const requestId = ++activeRequestIdRef.current
+      const controller = new AbortController()
+      controllerRef.current = controller
       setRunning(true)
       opts?.onStart?.()
       const startedAt = performance.now()
@@ -50,7 +55,7 @@ export function useAIStream() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
-          signal: controllerRef.current.signal,
+          signal: controller.signal,
         })
         if (!res.ok || !res.body) {
           const txt = await res.text()
@@ -80,7 +85,9 @@ export function useAIStream() {
                   seenFirst = true
                   setFirstCharMs(performance.now() - startedAt)
                 }
-                opts?.onDelta?.(parsed.delta)
+                if (activeRequestIdRef.current === requestId) {
+                  opts?.onDelta?.(parsed.delta)
+                }
               } else if (parsed.error) {
                 throw new Error(parsed.error)
               }
@@ -98,25 +105,35 @@ export function useAIStream() {
           }
         }
 
-        opts?.onComplete?.()
+        if (activeRequestIdRef.current === requestId) {
+          opts?.onComplete?.()
+        }
       } catch (err: unknown) {
         const e = err as Error
         if (e.name === 'AbortError') {
           // aborted by caller
         } else {
-          opts?.onError?.(e)
+          if (activeRequestIdRef.current === requestId) {
+            opts?.onError?.(e)
+          }
         }
       } finally {
-        setRunning(false)
-        controllerRef.current = null
+        if (activeRequestIdRef.current === requestId) {
+          runningRef.current = false
+          setRunning(false)
+          controllerRef.current = null
+        }
       }
     },
-    [running]
+    []
   )
 
   const stop = useCallback(() => {
+    // Invalidate any in-flight request so its finally block can't clobber newer state.
+    activeRequestIdRef.current += 1
     controllerRef.current?.abort()
     controllerRef.current = null
+    runningRef.current = false
     setRunning(false)
   }, [])
 

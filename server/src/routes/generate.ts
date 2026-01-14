@@ -48,10 +48,6 @@ export default async function (fastify: FastifyInstance): Promise<void> {
         const { segmentInput } = await import('../services/segmenter')
         const segments = segmentInput(input, 1000)
 
-        // prefer llm apiKey/baseUrl from request body when provided (frontend can send custom provider config)
-        // const requestApiKey = (body as any).llm?.apiKey as string | undefined
-        // const requestBaseUrl = (body as any).llm?.baseUrl as string | undefined
-        // const requestModel = (body as any).llm?.model as string | undefined
         const requestApiKey = body.llm?.apiKey
         const requestBaseUrl = body.llm?.baseUrl
         const requestModel = body.llm?.model

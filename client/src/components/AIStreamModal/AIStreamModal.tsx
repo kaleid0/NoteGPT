@@ -120,7 +120,10 @@ export default function AIStreamModal({ input, onAccept, onDiscard }: Props) {
               stop()
               onAccept(text)
             }}
-            disabled={running && text.length === 0}
+            disabled={running}
+            style={
+              running ? { opacity: 0.6, cursor: 'not-allowed', backgroundColor: '#94a3b8' } : {}
+            }
           >
             采用
           </button>

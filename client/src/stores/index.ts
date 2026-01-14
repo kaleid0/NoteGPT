@@ -1,2 +1,2 @@
-export { default as useNotesStore } from './notesStore';
-export { default as useSyncStore } from './syncStore';
+export { default as useNotesStore } from './notesStore'
+export { default as useSyncStore } from './syncStore'

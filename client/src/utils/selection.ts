@@ -9,9 +9,8 @@ export type SelectionInfo = {
  * 获取当前选中的文本信息
  */
 export function getSelectionInfo(): SelectionInfo {
-  const active = document.activeElement as HTMLElement | null
-
   // textarea or input selection
+  const active = document.activeElement as HTMLElement | null
   if (
     active &&
     (active.tagName === 'TEXTAREA' ||

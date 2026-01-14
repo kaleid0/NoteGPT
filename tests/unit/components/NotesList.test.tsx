@@ -4,6 +4,7 @@ import * as useNotesMod from '../../../client/src/hooks/useNotes'
 import * as syncContextMod from '../../../client/src/context/SyncContext'
 import NotesList from '../../../client/src/pages/NotesList'
 import { MemoryRouter } from 'react-router-dom'
+import { vi, describe, it, beforeEach, expect } from 'vitest'
 
 // Mock NoteList component to avoid ToastProvider requirement
 vi.mock('../../../client/src/components/NoteList/NoteList', () => ({
@@ -11,7 +12,7 @@ vi.mock('../../../client/src/components/NoteList/NoteList', () => ({
     <button aria-label="Create note" onClick={onCreate}>
       Create note
     </button>
-  )
+  ),
 }))
 
 describe('NotesList page', () => {
@@ -20,13 +21,13 @@ describe('NotesList page', () => {
     const reload = vi.fn().mockResolvedValue(undefined)
     const syncCreate = vi.fn().mockResolvedValue(undefined)
 
-    vi.spyOn(useNotesMod, 'useNotes').mockReturnValue({ 
-      notes, 
-      create: vi.fn(), 
-      reload, 
-      remove: vi.fn(), 
+    vi.spyOn(useNotesMod, 'useNotes').mockReturnValue({
+      notes,
+      create: vi.fn(),
+      reload,
+      remove: vi.fn(),
       update: vi.fn(),
-      replaceRange: vi.fn()
+      replaceRange: vi.fn(),
     } as any)
 
     vi.spyOn(syncContextMod, 'useSyncContext').mockReturnValue({
@@ -39,7 +40,7 @@ describe('NotesList page', () => {
       syncDelete: vi.fn(),
       lastRemoteUpdate: 0,
       lastUpdatedNote: null,
-      lastDeletedNoteId: null
+      lastDeletedNoteId: null,
     } as any)
 
     // freeze time to make id deterministic

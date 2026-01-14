@@ -1,4 +1,5 @@
 import { segmentInput } from '../../../server/src/services/segmenter'
+import { vi, describe, it, expect } from 'vitest'
 
 describe('segmentInput', () => {
   it('returns original if short', () => {

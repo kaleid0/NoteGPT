@@ -33,16 +33,24 @@ test.describe('AI streaming performance', () => {
     await page.goto(base + '/')
     await page.waitForLoadState('load')
     // debug logging
-    page.on('console', msg => console.log('[PAGE CONSOLE]', msg.type(), msg.text()))
-    page.on('pageerror', err => console.log('[PAGE ERROR]', err))
+    page.on('console', (msg) => console.log('[PAGE CONSOLE]', msg.type(), msg.text()))
+    page.on('pageerror', (err) => console.log('[PAGE ERROR]', err))
     page.on('crash', () => console.log('[PAGE CRASHED]'))
     page.on('close', () => console.log('[PAGE CLOSED]'))
-    page.on('requestfailed', req => console.log('[REQUEST FAILED]', req.url(), req.failure()?.errorText ?? ''))
+    page.on('requestfailed', (req) =>
+      console.log('[REQUEST FAILED]', req.url(), req.failure()?.errorText ?? '')
+    )
 
     // seed a note
     const noteId = 'perf-note-1'
     const now = new Date().toISOString()
-    const note = { id: noteId, title: 'Perf Note', content: 'hello world', createdAt: now, updatedAt: now }
+    const note = {
+      id: noteId,
+      title: 'Perf Note',
+      content: 'hello world',
+      createdAt: now,
+      updatedAt: now,
+    }
 
     // write with retries to avoid transient failures
     for (let i = 0; i < 3; i++) {
@@ -89,20 +97,29 @@ test.describe('AI streaming performance', () => {
 
     try {
       // Wait for first non-empty text node inside the content area
-      await page.waitForFunction((selector) => {
-        const el = document.querySelector(selector)
-        if (!el) return false
-        return el.textContent && el.textContent.trim().length > 0
-      }, `[role="dialog"] .ai-stream-content`, { timeout: 15000 })
+      await page.waitForFunction(
+        (selector) => {
+          const el = document.querySelector(selector)
+          if (!el) return false
+          return el.textContent && el.textContent.trim().length > 0
+        },
+        `[role="dialog"] .ai-stream-content`,
+        { timeout: 15000 }
+      )
 
       const firstCharAt = Date.now()
       latency = firstCharAt - start
-    } catch (err) {
-      errorMessage = String(err && err.message ? err.message : err)
+    } catch (err: unknown) {
+      errorMessage = String(err instanceof Error && err.message ? err.message : err)
       console.warn('[PERF] Error measuring first-char latency:', errorMessage)
     } finally {
       // Save result (always attempt to write a file so CI artifact step can find it)
-      const results = { timestamp: new Date().toISOString(), browser: browserName, latency, error: errorMessage }
+      const results = {
+        timestamp: new Date().toISOString(),
+        browser: browserName,
+        latency,
+        error: errorMessage,
+      }
       try {
         fs.mkdirSync(RESULTS_DIR, { recursive: true })
         const fname = path.join(RESULTS_DIR, `ai-first-char-${Date.now()}.json`)

@@ -5,7 +5,9 @@ export default function AIStreamTester({ onDelta }: { onDelta: (d: string) => vo
   const { start } = useAIStream()
   return (
     <div>
-      <button data-testid="start-btn" onClick={() => start('input', { onDelta: onDelta })}>start</button>
+      <button data-testid="start-btn" onClick={() => start('input', { onDelta: onDelta })}>
+        start
+      </button>
     </div>
   )
 }

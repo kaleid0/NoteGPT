@@ -1,3 +1,4 @@
+import { vi, describe, it, expect } from 'vitest'
 import { getSelectionInfo } from '../../../client/src/utils/selection'
 
 describe('selection util', () => {

@@ -26,7 +26,6 @@ const PROVIDER_DEFAULTS: Record<
 
 const DEFAULT_PROMPT_TEMPLATE = `<role>
 你是一位写作助手，帮助用户整理和润色笔记内容。
-用户会输入一段笔记，你需要根据用户的需求（如：重写、润色、总结等）对内容进行处理。
 </role>
 
 <requirements>
@@ -34,8 +33,6 @@ const DEFAULT_PROMPT_TEMPLATE = `<role>
 - 润色语言，使其更自然流畅
 - 不要扩展内容、增加细节或解释
 - 重写为markdown格式，使结构更清晰
-- 总结，提炼重点
-- 不要虚构事实，不要改变用户立场
 - 输出只包含最终内容，不包含解释说明
 </requirements>
 

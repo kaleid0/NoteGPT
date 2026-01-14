@@ -10,38 +10,41 @@ test('delete note from notes list with confirmation', async ({ page, baseURL }) 
   await page.goto(base)
   await page.waitForLoadState('networkidle')
 
-  await page.evaluate(({ noteId, now }) => {
-    return new Promise<void>((resolve, reject) => {
-      const req = indexedDB.open('notegpt-db', 1)
-      req.onupgradeneeded = (evt) => {
-        const db = (evt.target as IDBOpenDBRequest).result
-        if (!db.objectStoreNames.contains('notes')) {
-          db.createObjectStore('notes', { keyPath: 'id' })
+  await page.evaluate(
+    ({ noteId, now }) => {
+      return new Promise<void>((resolve, reject) => {
+        const req = indexedDB.open('notegpt-db', 1)
+        req.onupgradeneeded = (evt) => {
+          const db = (evt.target as IDBOpenDBRequest).result
+          if (!db.objectStoreNames.contains('notes')) {
+            db.createObjectStore('notes', { keyPath: 'id' })
+          }
         }
-      }
-      req.onsuccess = () => {
-        const db = req.result
-        const tx = db.transaction('notes', 'readwrite')
-        const store = tx.objectStore('notes')
-        store.put({
-          id: noteId,
-          title: 'E2E Test Note',
-          content: 'This note will be deleted',
-          createdAt: now,
-          updatedAt: now
-        })
-        tx.oncomplete = () => {
-          db.close()
-          resolve()
+        req.onsuccess = () => {
+          const db = req.result
+          const tx = db.transaction('notes', 'readwrite')
+          const store = tx.objectStore('notes')
+          store.put({
+            id: noteId,
+            title: 'E2E Test Note',
+            content: 'This note will be deleted',
+            createdAt: now,
+            updatedAt: now,
+          })
+          tx.oncomplete = () => {
+            db.close()
+            resolve()
+          }
+          tx.onerror = () => {
+            db.close()
+            reject(tx.error)
+          }
         }
-        tx.onerror = () => {
-          db.close()
-          reject(tx.error)
-        }
-      }
-      req.onerror = () => reject(req.error)
-    })
-  }, { noteId, now })
+        req.onerror = () => reject(req.error)
+      })
+    },
+    { noteId, now }
+  )
 
   // Reload to show the seeded note
   await page.reload()
@@ -56,7 +59,9 @@ test('delete note from notes list with confirmation', async ({ page, baseURL }) 
   await noteCard.locator(`button[aria-label="Delete note ${noteId}"]`).click()
 
   // Confirm dialog should appear
-  const confirmDialog = page.locator('role=dialog').or(page.locator('text=确认删除该笔记吗？').locator('..').locator('..'))
+  const confirmDialog = page
+    .locator('role=dialog')
+    .or(page.locator('text=确认删除该笔记吗？').locator('..').locator('..'))
   await expect(confirmDialog.getByText('确认')).toBeVisible()
 
   // Click confirm
@@ -94,38 +99,41 @@ test('inline title edit saves on Enter and blur', async ({ page, baseURL }) => {
   await page.goto(base)
   await page.waitForLoadState('networkidle')
 
-  await page.evaluate(({ noteId, now }) => {
-    return new Promise<void>((resolve, reject) => {
-      const req = indexedDB.open('notegpt-db', 1)
-      req.onupgradeneeded = (evt) => {
-        const db = (evt.target as IDBOpenDBRequest).result
-        if (!db.objectStoreNames.contains('notes')) {
-          db.createObjectStore('notes', { keyPath: 'id' })
+  await page.evaluate(
+    ({ noteId, now }) => {
+      return new Promise<void>((resolve, reject) => {
+        const req = indexedDB.open('notegpt-db', 1)
+        req.onupgradeneeded = (evt) => {
+          const db = (evt.target as IDBOpenDBRequest).result
+          if (!db.objectStoreNames.contains('notes')) {
+            db.createObjectStore('notes', { keyPath: 'id' })
+          }
         }
-      }
-      req.onsuccess = () => {
-        const db = req.result
-        const tx = db.transaction('notes', 'readwrite')
-        const store = tx.objectStore('notes')
-        store.put({
-          id: noteId,
-          title: 'Original Title',
-          content: 'Test content',
-          createdAt: now,
-          updatedAt: now
-        })
-        tx.oncomplete = () => {
-          db.close()
-          resolve()
+        req.onsuccess = () => {
+          const db = req.result
+          const tx = db.transaction('notes', 'readwrite')
+          const store = tx.objectStore('notes')
+          store.put({
+            id: noteId,
+            title: 'Original Title',
+            content: 'Test content',
+            createdAt: now,
+            updatedAt: now,
+          })
+          tx.oncomplete = () => {
+            db.close()
+            resolve()
+          }
+          tx.onerror = () => {
+            db.close()
+            reject(tx.error)
+          }
         }
-        tx.onerror = () => {
-          db.close()
-          reject(tx.error)
-        }
-      }
-      req.onerror = () => reject(req.error)
-    })
-  }, { noteId, now })
+        req.onerror = () => reject(req.error)
+      })
+    },
+    { noteId, now }
+  )
 
   // Navigate to note detail page
   await page.goto(`${base}/note/${noteId}`)

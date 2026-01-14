@@ -34,7 +34,9 @@ test.describe('AI Proxy Integration', () => {
     await page.waitForURL(/\/note\//)
 
     // Fill in content
-    const contentArea = page.locator('textarea, [contenteditable="true"], input[type="text"]').first()
+    const contentArea = page
+      .locator('textarea, [contenteditable="true"], input[type="text"]')
+      .first()
     await contentArea.fill('Hello world, please summarize this.')
     await page.waitForTimeout(500)
 
@@ -47,10 +49,13 @@ test.describe('AI Proxy Integration', () => {
 
     // Wait for streaming content to be long enough
     const content = modal.locator('.ai-stream-content')
-    await expect(async () => {
-      const text = await content.textContent()
-      expect(text?.length).toBeGreaterThan(10)
-    }, { timeout: 15000 }).toPass()
+    await expect(
+      async () => {
+        const text = await content.textContent()
+        expect(text?.length).toBeGreaterThan(10)
+      },
+      { timeout: 15000 }
+    ).toPass()
 
     // Should have some generated text
     const text = await content.textContent()
@@ -64,7 +69,9 @@ test.describe('AI Proxy Integration', () => {
     await page.click('button[aria-label="Create note"]')
     await page.waitForURL(/\/note\//)
 
-    const contentArea = page.locator('textarea, [contenteditable="true"], input[type="text"]').first()
+    const contentArea = page
+      .locator('textarea, [contenteditable="true"], input[type="text"]')
+      .first()
     await contentArea.fill('Test content for AI')
     await page.waitForTimeout(500)
 
@@ -92,7 +99,9 @@ test.describe('AI Proxy Integration', () => {
     await page.click('button[aria-label="Create note"]')
     await page.waitForURL(/\/note\//)
 
-    const contentArea = page.locator('textarea, [contenteditable="true"], input[type="text"]').first()
+    const contentArea = page
+      .locator('textarea, [contenteditable="true"], input[type="text"]')
+      .first()
     await contentArea.fill('Test content')
     await page.waitForTimeout(500)
 
@@ -116,7 +125,9 @@ test.describe('AI Proxy Integration', () => {
     await page.click('button[aria-label="Create note"]')
     await page.waitForURL(/\/note\//)
 
-    const contentArea = page.locator('textarea, [contenteditable="true"], input[type="text"]').first()
+    const contentArea = page
+      .locator('textarea, [contenteditable="true"], input[type="text"]')
+      .first()
     await contentArea.fill('Test')
     await page.waitForTimeout(300)
 

@@ -1,4 +1,6 @@
 import React from 'react'
+import { vi, describe, it, expect } from 'vitest'
+
 import * as notesDAO from '../../../client/src/lib/db/notes'
 import useNotesStore from '../../../client/src/stores/notesStore'
 import { useNotes } from '../../../client/src/hooks/useNotes'
