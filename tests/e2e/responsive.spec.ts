@@ -25,7 +25,8 @@ test.describe('Responsive Layout Verification', () => {
     test(`note detail layout is correct on ${viewport.name}`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height })
       await page.goto('/')
-      await page.click('button:has-text("New Note")')
+      // use aria-label for stability across locales
+      await page.click('button[aria-label="Create note"]')
       await page.waitForURL(/\/note\//)
 
       await expect(page.locator('textarea')).toBeVisible()

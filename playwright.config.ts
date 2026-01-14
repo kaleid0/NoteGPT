@@ -26,17 +26,21 @@ const config = {
     screenshot: 'only-on-failure',
   },
   // In CI with PW_BASE_URL set, servers are started externally; skip webServer
-  webServer: process.env.PW_BASE_URL ? undefined : (process.env.CI ? {
-    command: 'npm --prefix client run build && npm --prefix client run preview -- --port 3000',
-    url: 'http://localhost:3000',
-    timeout: 180000,
-    reuseExistingServer: true,
-  } : {
-    command: 'npm --prefix client run dev -- --host 0.0.0.0',
-    url: 'http://localhost:3000',
-    timeout: 120000,
-    reuseExistingServer: false,
-  }),
+  webServer: process.env.PW_BASE_URL
+    ? undefined
+    : process.env.CI
+    ? {
+        command: 'npm --prefix client run build && npm --prefix client run preview -- --port 3000',
+        url: 'http://localhost:3000',
+        timeout: 180000,
+        reuseExistingServer: true,
+      }
+    : {
+        command: 'npm --prefix client run dev -- --host 0.0.0.0',
+        url: 'http://localhost:3000',
+        timeout: 120000,
+        reuseExistingServer: false,
+      },
 }
 
 // Add global setup/teardown only if not in CI or with custom baseURL

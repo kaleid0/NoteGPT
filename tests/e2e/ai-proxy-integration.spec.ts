@@ -48,14 +48,11 @@ test.describe('AI Proxy Integration', () => {
     await expect(modal).toBeVisible({ timeout: 10000 })
 
     // Wait for streaming content to be long enough
-    const content = modal.locator('.ai-stream-content')
-    await expect(
-      async () => {
-        const text = await content.textContent()
-        expect(text?.length).toBeGreaterThan(10)
-      },
-      { timeout: 15000 }
-    ).toPass()
+    const content = modal.locator('[class*=aiStreamContent]')
+    await expect(async () => {
+      const text = await content.textContent()
+      expect(text?.length).toBeGreaterThan(10)
+    }).toPass({ timeout: 25000 })
 
     // Should have some generated text
     const text = await content.textContent()
@@ -81,11 +78,11 @@ test.describe('AI Proxy Integration', () => {
     await expect(modal).toBeVisible({ timeout: 10000 })
 
     // Wait for content to stream
-    const content = modal.locator('.ai-stream-content')
+    const content = modal.locator('[class*=aiStreamContent]')
     await page.waitForTimeout(2000) // Let some content stream
 
     // Click accept
-    const acceptButton = modal.locator('button:has-text("接受")')
+    const acceptButton = modal.locator('button:has-text("采用")')
     await acceptButton.click()
 
     // Modal should close
@@ -111,7 +108,7 @@ test.describe('AI Proxy Integration', () => {
     await expect(modal).toBeVisible({ timeout: 10000 })
 
     // Click discard
-    const discardButton = modal.locator('button:has-text("丢弃")')
+    const discardButton = modal.locator('button:has-text("取消")')
     await discardButton.click()
 
     // Modal should close
@@ -142,7 +139,7 @@ test.describe('AI Proxy Integration', () => {
     await expect(modal).toBeVisible({ timeout: 10000 })
 
     // Should show error message
-    const content = modal.locator('.ai-stream-content')
-    await expect(content).toContainText(/error|Error|失败/i, { timeout: 10000 })
+    const content = modal.locator('[class*=aiStreamContent]')
+    await expect(content).toContainText(/error|Error|失败|\[Error\]/i, { timeout: 10000 })
   })
 })

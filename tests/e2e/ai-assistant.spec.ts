@@ -25,20 +25,23 @@ test('ai assistant modal streams and accept replaces content', async ({ page, ba
   await page.goto(base + '/')
   await page.waitForLoadState('load')
   // debug logging
-  page.on('console', msg => console.log('[PAGE CONSOLE]', msg.type(), msg.text()))
-  page.on('pageerror', err => console.log('[PAGE ERROR]', err))
+  page.on('console', (msg) => console.log('[PAGE CONSOLE]', msg.type(), msg.text()))
+  page.on('pageerror', (err) => console.log('[PAGE ERROR]', err))
   page.on('crash', () => console.log('[PAGE CRASHED]'))
   page.on('close', () => console.log('[PAGE CLOSED]'))
-  page.on('requestfailed', req => console.log('[REQUEST FAILED]', req.url(), req.failure()?.errorText ?? ''))
+  page.on('requestfailed', (req) =>
+    console.log('[REQUEST FAILED]', req.url(), req.failure()?.errorText ?? '')
+  )
 
   // ensure DB is clean
-  await page.evaluate(() =>
-    new Promise<void>((res) => {
-      const req = indexedDB.deleteDatabase('notegpt-db')
-      req.onsuccess = () => res()
-      req.onerror = () => res()
-      req.onblocked = () => res()
-    })
+  await page.evaluate(
+    () =>
+      new Promise<void>((res) => {
+        const req = indexedDB.deleteDatabase('notegpt-db')
+        req.onsuccess = () => res()
+        req.onerror = () => res()
+        req.onblocked = () => res()
+      })
   )
 
   // create a new note via the UI (more robust than direct IndexedDB writes)
@@ -72,7 +75,7 @@ test('ai assistant modal streams and accept replaces content', async ({ page, ba
   await page.waitForTimeout(500)
 
   // click Accept
-  await page.click('button:has-text("接受")')
+  await page.click('button:has-text("采用")')
 
   // expect textarea content changed (placeholder "Hello world" was filled, AI should replace it)
   await expect(ta).not.toHaveValue('')

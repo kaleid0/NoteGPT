@@ -2,8 +2,8 @@
  * SQLite 数据库服务层单元测试
  */
 import { describe, it, expect, beforeEach, afterAll } from 'vitest'
-import * as db from '../src/services/database'
-import type { Note } from '../../shared/sync-protocol'
+import * as db from '../../../server/src/services/database'
+import type { Note } from '../../../shared/sync-protocol'
 import fs from 'fs'
 import path from 'path'
 

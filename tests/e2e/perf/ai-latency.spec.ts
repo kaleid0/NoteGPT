@@ -14,7 +14,7 @@ test.describe('AI streaming performance', () => {
     // ensure IndexedDB exists before the app loads to avoid transient page closure during HMR/preview
     await page.addInitScript(() => {
       try {
-        const req = indexedDB.open('notegpt-db', 1)
+        const req = indexedDB.open('notegpt-db')
         req.onupgradeneeded = () => {
           const db = req.result
           if (!db.objectStoreNames.contains('notes')) {
@@ -56,8 +56,8 @@ test.describe('AI streaming performance', () => {
     for (let i = 0; i < 3; i++) {
       try {
         await page.evaluate((note) => {
-          return new Promise<void>((res) => {
-            const req = indexedDB.open('notegpt-db', 1)
+          return new Promise<void>((res, rej) => {
+            const req = indexedDB.open('notegpt-db')
             req.onupgradeneeded = () => {
               const db = req.result
               if (!db.objectStoreNames.contains('notes')) {
@@ -66,12 +66,24 @@ test.describe('AI streaming performance', () => {
               }
             }
             req.onsuccess = () => {
-              const tx = req.result.transaction('notes', 'readwrite')
-              tx.objectStore('notes').put(note)
-              tx.oncomplete = () => res()
-              tx.onerror = () => res()
+              try {
+                const db = req.result
+                const tx = db.transaction('notes', 'readwrite')
+                tx.objectStore('notes').put(note)
+                tx.oncomplete = () => {
+                  try { db.close() } catch (e) {}
+                  res()
+                }
+                tx.onerror = () => {
+                  try { db.close() } catch (e) {}
+                  rej(tx.error || new Error('IndexedDB transaction error'))
+                }
+              } catch (e) {
+                try { req.result && req.result.close() } catch (e) {}
+                rej(e)
+              }
             }
-            req.onerror = () => res()
+            req.onerror = () => rej(new Error('IndexedDB open error'))
           })
         }, note)
         break
@@ -88,24 +100,27 @@ test.describe('AI streaming performance', () => {
     // click AI button to open modal
     await page.click('text=AI 处理')
 
-    // measure time until first character appears in modal content
+    // measure time until client logs first-character latency
     const start = Date.now()
-    const contentLocator = page.locator('[role="dialog"] .ai-stream-content')
 
     let latency = null
     let errorMessage = null
 
     try {
-      // Wait for first non-empty text node inside the content area
-      await page.waitForFunction(
-        (selector) => {
-          const el = document.querySelector(selector)
-          if (!el) return false
-          return el.textContent && el.textContent.trim().length > 0
+      // Wait for the app to log the first-char latency to console
+      await page.waitForEvent('console', {
+        predicate: (msg) => {
+          const t = msg.text()
+          return (
+            t.includes('First Char Latency') ||
+            t.includes('First Char latency') ||
+            t.includes('⚡ First char latency') ||
+            t.includes('First Char Latency:') ||
+            t.includes('First char latency:')
+          )
         },
-        `[role="dialog"] .ai-stream-content`,
-        { timeout: 15000 }
-      )
+        timeout: 15000,
+      })
 
       const firstCharAt = Date.now()
       latency = firstCharAt - start

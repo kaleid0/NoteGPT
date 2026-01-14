@@ -10,6 +10,21 @@ test('delete note from notes list with confirmation', async ({ page, baseURL }) 
   await page.goto(base)
   await page.waitForLoadState('networkidle')
 
+  // Clear IndexedDB for origin to avoid version conflicts (resilient seeding)
+  const cleanupPage = await page.context().newPage()
+  try {
+    await cleanupPage.goto(base)
+    await cleanupPage.waitForLoadState('domcontentloaded')
+    const client = await cleanupPage.context().newCDPSession(cleanupPage)
+    try {
+      await client.send('Storage.clearDataForOrigin', { origin: base, storageTypes: 'indexeddb' })
+    } finally {
+      await client.detach()
+    }
+  } finally {
+    await cleanupPage.close()
+  }
+
   await page.evaluate(
     ({ noteId, now }) => {
       return new Promise<void>((resolve, reject) => {
@@ -59,13 +74,14 @@ test('delete note from notes list with confirmation', async ({ page, baseURL }) 
   await noteCard.locator(`button[aria-label="Delete note ${noteId}"]`).click()
 
   // Confirm dialog should appear
-  const confirmDialog = page
-    .locator('role=dialog')
-    .or(page.locator('text=确认删除该笔记吗？').locator('..').locator('..'))
-  await expect(confirmDialog.getByText('确认')).toBeVisible()
+  let confirmDialog = page.locator('role=dialog')
+  if ((await confirmDialog.count()) === 0) {
+    confirmDialog = page.locator('text=确认删除该笔记吗？').locator('..').locator('..')
+  }
+  await expect(confirmDialog.getByRole('button', { name: '确认' })).toBeVisible()
 
   // Click confirm
-  await confirmDialog.getByText('确认').click()
+  await confirmDialog.getByRole('button', { name: '确认' }).click()
 
   // Note should be removed from the list
   await expect(noteCard).not.toBeVisible({ timeout: 3000 })
@@ -98,6 +114,21 @@ test('inline title edit saves on Enter and blur', async ({ page, baseURL }) => {
   // Pre-seed IndexedDB with a note
   await page.goto(base)
   await page.waitForLoadState('networkidle')
+
+  // Clear IndexedDB for origin to avoid version conflicts (resilient seeding)
+  const cleanupPage = await page.context().newPage()
+  try {
+    await cleanupPage.goto(base)
+    await cleanupPage.waitForLoadState('domcontentloaded')
+    const client = await cleanupPage.context().newCDPSession(cleanupPage)
+    try {
+      await client.send('Storage.clearDataForOrigin', { origin: base, storageTypes: 'indexeddb' })
+    } finally {
+      await client.detach()
+    }
+  } finally {
+    await cleanupPage.close()
+  }
 
   await page.evaluate(
     ({ noteId, now }) => {
