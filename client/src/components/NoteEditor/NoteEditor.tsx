@@ -1,11 +1,11 @@
-import styles from './NoteEditor.module.css';
+import styles from './NoteEditor.module.css'
 
 export default function NoteEditor({
   content = '',
   onChange,
 }: {
-  content?: string;
-  onChange?: (s: string) => void;
+  content?: string
+  onChange?: (s: string) => void
 }) {
   return (
     <div className={styles.editor}>
@@ -16,5 +16,5 @@ export default function NoteEditor({
         aria-label="Note editor"
       />
     </div>
-  );
+  )
 }

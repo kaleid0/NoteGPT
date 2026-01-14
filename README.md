@@ -11,31 +11,36 @@
 ## ✨ 功能特性
 
 ### 📒 笔记管理
+
 - **完整的 CRUD 操作** - 创建、编辑、删除笔记
 - **本地优先** - 使用 IndexedDB 本地存储，无需注册账号
 - **自动保存** - 编辑时自动保存，防止数据丢失
 - **实时同步** - WebSocket 支持多设备实时协作
 
 ### 🤖 AI 辅助写作
+
 - **流式输出** - 使用 Server-Sent Events (SSE) 实现，首字符延迟仅 ~170ms
 - **智能选择** - 支持选中文本或全文的 AI 改进
 - **多提供商支持**:
-  - OpenAI (GPT-3.5-turbo, GPT-4)
+  - OpenAI
   - DeepSeek
-  - 百炼 (Bailian)
+  - 百炼
   - 自定义提供商
 
 ### ⚙️ 高度可配置
+
 - **自定义 Prompt 模板** - 支持 `{{input}}` 占位符
 - **本地持久化** - 配置保存在 localStorage
 - **预设模板库** - 开箱即用的常用模板
 
 ### 📱 响应式设计
+
 - 移动设备 (iPhone 12: 375px)
 - 平板设备 (iPad: 768px)  
 - 桌面设备 (1366px+)
 
 ### ♿ 可访问性
+
 - ARIA 标签和角色
 - 完整的键盘导航支持
 - 屏幕阅读器兼容
@@ -70,12 +75,12 @@ npm install
 cd server
 npm run dev
 
-# 终端 2: 启动前端服务 (默认端口 5173)
+# 终端 2: 启动前端服务 (默认端口 3000)
 cd client
 npm run dev
 ```
 
-访问 [http://localhost:5173](http://localhost:5173) 开始使用。
+访问 [http://localhost:3000](http://localhost:3000) 开始使用。
 
 ### 生产构建
 
@@ -152,6 +157,7 @@ NoteGPT/
 | Prompt Template | 自定义提示词模板 |
 
 **Prompt 模板示例**：
+
 ```
 请帮我改进以下文本，使其更加专业和易读：
 
@@ -170,6 +176,18 @@ PORT=4000
 LOG_LEVEL=info
 ```
 
+### 安全说明
+
+**API Key 管理**
+
+- 前端 localStorage 存储（演示用）
+- **生产建议**: 使用后端代理和 vault 存储
+
+**访问控制**
+
+- 实现了基本的 token 认证
+- 实现了速率限制中间件
+
 ---
 
 ## 🧪 测试
@@ -180,9 +198,6 @@ npm run test:unit
 
 # 运行 E2E 测试
 npm run test:e2e
-
-# 在 client 目录运行测试
-cd client && npm test
 
 # 在 server 目录运行测试
 cd server && npm test
@@ -213,6 +228,7 @@ cd server && npm test
 ## 🛠️ 技术栈
 
 ### 前端
+
 - **React 18** - UI 框架
 - **TypeScript 5** - 类型安全
 - **Vite 5** - 构建工具
@@ -222,12 +238,14 @@ cd server && npm test
 - **CSS Modules** - 样式隔离
 
 ### 后端
+
 - **Fastify** - Web 框架
 - **WebSocket** - 实时通信
 - **Better-SQLite3** - 数据库
 - **ts-node-dev** - 开发服务器
 
 ### 测试
+
 - **Vitest** - 单元测试
 - **Playwright** - E2E 测试
 - **Testing Library** - React 组件测试
@@ -287,18 +305,3 @@ WebSocket /v1/sync?token=xxx
 ## 📄 许可证
 
 本项目基于 MIT 许可证开源 - 查看 [LICENSE](LICENSE) 文件了解详情。
-
----
-
-## 🙏 致谢
-
-- [React](https://react.dev/)
-- [Fastify](https://www.fastify.io/)
-- [OpenAI](https://openai.com/)
-- [Vite](https://vitejs.dev/)
-
----
-
-<p align="center">
-  Made with ❤️ by <a href="https://github.com/kaleid0">kaleid0</a>
-</p>

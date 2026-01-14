@@ -1,33 +1,44 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import NotesList from './pages/NotesList';
-import NoteDetail from './pages/NoteDetail';
-import { ToastProvider } from './components/Toast';
-import LLMSettings from './components/Settings/LLMSettings';
-import { SyncProvider, ConnectionIndicator } from './context/SyncContext';
-import Container from './ui/Layout';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import NotesList from './pages/NotesList'
+import NoteDetail from './pages/NoteDetail'
+import { ToastProvider } from './components/Toast'
+import LLMSettings from './components/Settings/LLMSettings'
+import { SyncProvider, ConnectionIndicator } from './context/SyncContext'
+import Container from './ui/Layout'
 
 export default function App() {
   return (
     <ToastProvider>
       <SyncProvider>
         <BrowserRouter>
-          <header style={{ 
-            backgroundColor: '#fff', 
-            borderBottom: '1px solid var(--border-color)', 
-            padding: '0.75rem 0',
-            marginBottom: '2rem',
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
-          }}>
-            <Container style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <header
+            style={{
+              backgroundColor: '#fff',
+              borderBottom: '1px solid var(--border-color)',
+              padding: '0.75rem 0',
+              marginBottom: '2rem',
+              boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+            }}
+          >
+            <Container
+              style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+            >
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <Link to="/" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary-color)' }}>
+                <Link
+                  to="/"
+                  style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary-color)' }}
+                >
                   NoteGPT
                 </Link>
                 <ConnectionIndicator />
               </div>
               <nav style={{ display: 'flex', gap: '1.5rem' }}>
-                <Link to="/" style={{ fontWeight: 500, color: 'var(--text-main)' }}>我的笔记</Link>
-                <Link to="/settings" style={{ fontWeight: 500, color: 'var(--text-main)' }}>设置</Link>
+                <Link to="/" style={{ fontWeight: 500, color: 'var(--text-main)' }}>
+                  我的笔记
+                </Link>
+                <Link to="/settings" style={{ fontWeight: 500, color: 'var(--text-main)' }}>
+                  设置
+                </Link>
               </nav>
             </Container>
           </header>
@@ -41,5 +52,5 @@ export default function App() {
         </BrowserRouter>
       </SyncProvider>
     </ToastProvider>
-  );
+  )
 }

@@ -4,4 +4,4 @@
  */
 
 // Re-export all types from shared
-export * from '../../../shared/sync-protocol';
+export * from '../../../shared/sync-protocol'

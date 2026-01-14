@@ -7,16 +7,16 @@ const PROVIDER_DEFAULTS: Record<
   Omit<LLMConfig, 'provider' | 'apiKey' | 'promptTemplate'>
 > = {
   openai: {
-    baseUrl: 'https://api.openai.com',
-    model: 'gpt-3.5-turbo',
+    baseUrl: 'https://api.openai.com/v1',
+    model: 'gpt-4',
   },
   deepseek: {
     baseUrl: 'https://api.deepseek.com',
     model: 'deepseek-chat',
   },
   bailian: {
-    baseUrl: 'https://api.bailian.com',
-    model: 'bailian-turbo',
+    baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    model: 'qwen-plus',
   },
   custom: {
     baseUrl: '',
@@ -26,7 +26,7 @@ const PROVIDER_DEFAULTS: Record<
 
 const DEFAULT_PROMPT_TEMPLATE = `<role>
 你是一位写作助手，帮助用户整理和润色笔记内容。
-用户会输入一段笔记，你需要根据用户的需求（如：扩展、重写、润色、总结等）对内容进行处理。
+用户会输入一段笔记，你需要根据用户的需求（如：重写、润色、总结等）对内容进行处理。
 </role>
 
 <requirements>
@@ -42,6 +42,7 @@ const DEFAULT_PROMPT_TEMPLATE = `<role>
 <user_input>
 {{input}}
 </user_input>`
+
 export default function LLMSettings() {
   const [cfg, setCfg] = useState<LLMConfig>({})
   const [saved, setSaved] = useState(false)
