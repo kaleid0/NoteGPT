@@ -36,3 +36,5 @@ specs/
 # Test artifacts
 tests/test-results/
 
+# SQlite
+data/

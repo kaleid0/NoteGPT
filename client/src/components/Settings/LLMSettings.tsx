@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react'
 import { loadLLMConfig, saveLLMConfig, LLMConfig } from '../../lib/llmConfig'
 import styles from './LLMSettings.module.css'
 
-const PROVIDER_DEFAULTS: Record<string, Omit<LLMConfig, 'provider' | 'apiKey' | 'promptTemplate'>> = {
+const PROVIDER_DEFAULTS: Record<
+  string,
+  Omit<LLMConfig, 'provider' | 'apiKey' | 'promptTemplate'>
+> = {
   openai: {
     baseUrl: 'https://api.openai.com',
     model: 'gpt-3.5-turbo',
@@ -29,7 +32,7 @@ const DEFAULT_PROMPT_TEMPLATE = `<role>
 <requirements>
 - 在不改变原始含义的前提下进行优化
 - 润色语言，使其更自然流畅
-- 扩展内容，增加细节或解释
+- 不要扩展内容、增加细节或解释
 - 重写为markdown格式，使结构更清晰
 - 总结，提炼重点
 - 不要虚构事实，不要改变用户立场
@@ -58,7 +61,8 @@ export default function LLMSettings() {
   }
 
   function handleProviderChange(provider: string) {
-    const defaults = PROVIDER_DEFAULTS[provider as keyof typeof PROVIDER_DEFAULTS] || PROVIDER_DEFAULTS.custom
+    const defaults =
+      PROVIDER_DEFAULTS[provider as keyof typeof PROVIDER_DEFAULTS] || PROVIDER_DEFAULTS.custom
     setCfg((c) => ({
       ...c,
       provider,
@@ -80,9 +84,9 @@ export default function LLMSettings() {
       <form className={styles.form}>
         <div className={styles.formGroup}>
           <label htmlFor="provider">提供商: </label>
-          <select 
+          <select
             id="provider"
-            value={cfg.provider || 'openai'} 
+            value={cfg.provider || 'openai'}
             onChange={(e) => handleProviderChange(e.target.value)}
             className={styles.select}
           >
@@ -95,11 +99,11 @@ export default function LLMSettings() {
 
         <div className={styles.formGroup}>
           <label htmlFor="apiKey">API Key: </label>
-          <input 
+          <input
             id="apiKey"
             type="password"
             className={styles.input}
-            value={cfg.apiKey || ''} 
+            value={cfg.apiKey || ''}
             onChange={(e) => update('apiKey', e.target.value)}
             placeholder="sk-..."
           />
@@ -107,11 +111,11 @@ export default function LLMSettings() {
 
         <div className={styles.formGroup}>
           <label htmlFor="baseUrl">Base URL: </label>
-          <input 
+          <input
             id="baseUrl"
             type="url"
             className={styles.input}
-            value={cfg.baseUrl || ''} 
+            value={cfg.baseUrl || ''}
             onChange={(e) => update('baseUrl', e.target.value)}
             placeholder="https://api.openai.com"
           />
@@ -119,11 +123,11 @@ export default function LLMSettings() {
 
         <div className={styles.formGroup}>
           <label htmlFor="model">Model: </label>
-          <input 
+          <input
             id="model"
             type="text"
             className={styles.input}
-            value={cfg.model || ''} 
+            value={cfg.model || ''}
             onChange={(e) => update('model', e.target.value)}
             placeholder="gpt-3.5-turbo"
           />
@@ -131,21 +135,19 @@ export default function LLMSettings() {
 
         <div className={styles.formGroup}>
           <label htmlFor="promptTemplate">Prompt 模板 (可使用 {'{{input}}'} 占位符): </label>
-          <textarea 
+          <textarea
             id="promptTemplate"
             className={styles.textarea}
-            value={cfg.promptTemplate || DEFAULT_PROMPT_TEMPLATE} 
+            value={cfg.promptTemplate || DEFAULT_PROMPT_TEMPLATE}
             onChange={(e) => update('promptTemplate', e.target.value)}
           />
-          <small className={styles.hint}>示例: 使用模板中的 {'{{input}}'} 占位符替换为用户输入的笔记。</small>
+          <small className={styles.hint}>
+            示例: 使用模板中的 {'{{input}}'} 占位符替换为用户输入的笔记。
+          </small>
         </div>
 
         <div className={styles.actions}>
-          <button 
-            type="button"
-            onClick={handleSave}
-            className={styles.button}
-          >
+          <button type="button" onClick={handleSave} className={styles.button}>
             保存设置
           </button>
           {saved && <span className={styles.successMessage}>✓ 已保存</span>}
