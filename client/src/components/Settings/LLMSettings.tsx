@@ -33,7 +33,7 @@ const DEFAULT_PROMPT_TEMPLATE = `<role>
 - 润色语言，使其更自然流畅
 - 不要扩展内容、增加细节或解释
 - 重写为markdown格式，使结构更清晰
-- 输出只包含最终内容，不包含解释说明
+- 请直接输出 Markdown，不要使用 \`\`\` Markdown \`\`\` 包裹内容
 </requirements>
 
 <user_input>

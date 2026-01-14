@@ -46,7 +46,7 @@ export default async function (fastify: FastifyInstance): Promise<void> {
 
         // segment input if too long
         const { segmentInput } = await import('../services/segmenter')
-        const segments = segmentInput(input, 1000)
+        const segments = segmentInput(input, 5000)
 
         const requestApiKey = body.llm?.apiKey
         const requestBaseUrl = body.llm?.baseUrl
