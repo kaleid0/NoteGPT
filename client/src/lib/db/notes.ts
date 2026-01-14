@@ -118,9 +118,6 @@ export async function getAllNotes(): Promise<Note[]> {
   return (await db.getAll('notes')) as Note[]
 }
 
-// TODO 一次性加载所有笔记及其内容，如果内容很多可能会导致性能问题
-// 但是indexedDB不支持部分加载
-// 需要分表 meta 和 content
 export async function getNote(id: string): Promise<Note | undefined> {
   const db = await getDB()
   return db.get('notes', id)
