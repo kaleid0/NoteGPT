@@ -38,3 +38,7 @@ tests/test-results/
 
 # SQlite
 data/
+server/data/
+
+# test
+test-results/
